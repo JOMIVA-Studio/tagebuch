@@ -28,7 +28,7 @@ $navItems = [
 <div class="app-shell">
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
   <aside class="sidebar admin-sidebar" id="sidebar">
-    <a href="/admin/index.php" class="logo sidebar-logo" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+    <a href="/admin/index.php" class="logo sidebar-logo" style="flex-direction: column; align-items: center; gap: 8px;">
       <img class="brand-logo brand-logo-md" src="/assets/img/logo-white.svg" alt="<?= e($appName) ?>">
       <span class="sidebar-admin-label">Administration</span>
     </a>
