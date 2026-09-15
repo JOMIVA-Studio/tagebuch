@@ -121,7 +121,7 @@ img, svg { max-width: 100%; }
 .sidebar-link:hover { background: rgba(255, 255, 255, 0.12); color: #fff; text-decoration: none; }
 .sidebar-link.active { background: #fff; color: var(--color-purple); }
 .sidebar.admin-sidebar .sidebar-link.active { color: var(--color-dark); }
-.nav-icon { width: 19px; height: 19px; flex-shrink: 0; }
+.nav-icon { width: 19px; height: 19px; flex-shrink: 0; vertical-align: -4px; }
 
 .sidebar-spacer { flex: 1; }
 .sidebar-footer { border-top: 1px solid rgba(255, 255, 255, 0.16); padding-top: 10px; margin-top: 10px; }
@@ -232,6 +232,9 @@ img, svg { max-width: 100%; }
 .card-accent-left.magenta { border-left-color: var(--color-magenta); }
 
 .stack-narrow { max-width: 520px; margin: 0 auto; }
+
+.quote-card { background: linear-gradient(135deg, rgba(181, 35, 162, 0.07), rgba(181, 35, 162, 0.02)); }
+.quote-text { font-size: 1.25rem; font-weight: 600; font-style: italic; line-height: 1.5; }
 
 /* ---------- Forms ---------- */
 .field { margin-bottom: 18px; }

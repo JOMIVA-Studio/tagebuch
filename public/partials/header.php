@@ -21,9 +21,10 @@ $currentScript = basename($_SERVER['SCRIPT_NAME']);
 $usesSidebarShell = $loggedInUser !== null;
 
 $navItems = [
-    ['href' => 'dashboard.php', 'label' => 'Kalender', 'icon' => 'calendar'],
-    ['href' => 'goals.php',     'label' => 'Ziele',    'icon' => 'target', 'alsoActive' => 'goal.php'],
-    ['href' => 'profile.php',   'label' => 'Profil',   'icon' => 'user'],
+    ['href' => 'dashboard.php', 'label' => 'Startseite', 'icon' => 'home'],
+    ['href' => 'goals.php',     'label' => 'Ziele',      'icon' => 'target', 'alsoActive' => 'goal.php'],
+    ['href' => 'tracker.php',   'label' => 'Tracker',    'icon' => 'droplet', 'alsoActive' => ['water.php', 'cycle.php']],
+    ['href' => 'profile.php',   'label' => 'Profil',     'icon' => 'user'],
 ];
 ?><!doctype html>
 <html lang="de">
@@ -45,7 +46,8 @@ $navItems = [
 
     <nav class="sidebar-nav">
       <?php foreach ($navItems as $item):
-          $isActive = $currentScript === $item['href'] || (isset($item['alsoActive']) && $currentScript === $item['alsoActive']);
+          $alsoActive = (array) ($item['alsoActive'] ?? []);
+          $isActive = $currentScript === $item['href'] || in_array($currentScript, $alsoActive, true);
       ?>
         <a href="/<?= $item['href'] ?>" class="sidebar-link <?= $isActive ? 'active' : '' ?>">
           <?= icon($item['icon']) ?><span><?= e($item['label']) ?></span>

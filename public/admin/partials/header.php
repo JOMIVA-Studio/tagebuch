@@ -10,6 +10,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME']);
 $navItems = [
     ['href' => 'index.php',      'label' => 'Uebersicht',    'icon' => 'grid'],
     ['href' => 'questions.php',  'label' => 'Fragen',        'icon' => 'list'],
+    ['href' => 'quotes.php',     'label' => 'Sprueche',      'icon' => 'quote'],
     ['href' => 'templates.php',  'label' => 'Mail-Vorlagen', 'icon' => 'mail', 'alsoActive' => 'template_edit.php'],
     ['href' => 'smtp.php',       'label' => 'SMTP',          'icon' => 'server'],
     ['href' => 'reminders.php',  'label' => 'Erinnerungen',  'icon' => 'bell'],

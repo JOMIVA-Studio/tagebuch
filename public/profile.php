@@ -30,6 +30,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if ($action === 'update_gender') {
+        $gender = $_POST['gender'] ?? '';
+        $gender = in_array($gender, ['weiblich', 'maennlich', 'divers'], true) ? $gender : null;
+        $stmt = $pdo->prepare('UPDATE users SET gender = :gender WHERE id = :id');
+        $stmt->execute(['gender' => $gender, 'id' => $user['id']]);
+        flash('success', 'Angabe gespeichert.');
+        redirect('/profile.php');
+    }
+
     if ($action === 'update_reminders') {
         $enabled = isset($_POST['reminder_emails_enabled']) ? 1 : 0;
         $stmt = $pdo->prepare('UPDATE users SET reminder_emails_enabled = :val WHERE id = :id');
@@ -87,6 +96,25 @@ require __DIR__ . '/partials/header.php';
         <input type="password" id="new_password_confirm" name="new_password_confirm" required minlength="8">
       </div>
       <button type="submit" class="btn btn-secondary mt-md">Passwort speichern</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Geschlecht</h3>
+    <p class="text-muted small">Wird nur fuer die Freischaltung des Zyklus-Trackers verwendet.</p>
+    <form method="post">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="update_gender">
+      <div class="field mb-0">
+        <label for="gender">Geschlecht</label>
+        <select id="gender" name="gender">
+          <option value="" <?= $user['gender'] === null ? 'selected' : '' ?>>Keine Angabe</option>
+          <option value="weiblich" <?= $user['gender'] === 'weiblich' ? 'selected' : '' ?>>Weiblich</option>
+          <option value="maennlich" <?= $user['gender'] === 'maennlich' ? 'selected' : '' ?>>Maennlich</option>
+          <option value="divers" <?= $user['gender'] === 'divers' ? 'selected' : '' ?>>Divers</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-ghost mt-md">Speichern</button>
     </form>
   </div>
 

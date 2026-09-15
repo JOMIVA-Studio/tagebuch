@@ -40,17 +40,35 @@ $weekdays = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 
 $goalsCount = user_has_goal((int) $user['id']);
 
-$pageTitle = 'Kalender';
+$quoteCount = (int) db()->query('SELECT COUNT(*) FROM quotes WHERE is_active = 1')->fetchColumn();
+$todayQuote = null;
+if ($quoteCount > 0) {
+    $offset = ((int) $today->format('z')) % $quoteCount;
+    $stmt = db()->prepare('SELECT * FROM quotes WHERE is_active = 1 ORDER BY sort_order, id LIMIT 1 OFFSET :offset');
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $todayQuote = $stmt->fetch();
+}
+
+$pageTitle = 'Startseite';
 $heroTone = 'green';
-$heroBadge = 'Tagebuch';
+$heroBadge = 'Startseite';
 $heroTitle = 'Hallo ' . $user['name'] . '!';
-$heroSubtitle = 'Waehle einen Tag im Kalender, um einen Eintrag zu erfassen.';
+$heroSubtitle = 'Deine Uebersicht mit Kalender und Spruch des Tages.';
 require __DIR__ . '/partials/header.php';
 ?>
 
 <?php if (!$goalsCount): ?>
   <div class="flash flash-info">
     Du hast noch kein Ziel angelegt. <a href="/goals.php?new=1">Jetzt erstes Ziel anlegen</a> (mindestens eines ist erforderlich).
+  </div>
+<?php endif; ?>
+
+<?php if ($todayQuote): ?>
+  <div class="card quote-card card-accent-left magenta">
+    <div class="text-muted small" style="font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Spruch des Tages</div>
+    <p class="quote-text mt-sm mb-0">&bdquo;<?= e($todayQuote['quote_text']) ?>&ldquo;</p>
+    <?php if (!empty($todayQuote['author'])): ?><p class="text-muted small mt-sm mb-0">— <?= e($todayQuote['author']) ?></p><?php endif; ?>
   </div>
 <?php endif; ?>
 
