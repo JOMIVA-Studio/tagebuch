@@ -1,0 +1,10 @@
+# Sicherheitsnetz: Falls Apache versehentlich auf diesen Projektordner statt
+# auf public/ zeigt, wird hier nichts ausgeliefert (Quellcode/Config/DB-Dumps
+# duerfen nie direkt ueber den Browser erreichbar sein).
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>
