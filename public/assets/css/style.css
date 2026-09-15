@@ -88,9 +88,9 @@ img, svg { max-width: 100%; }
 .logo { display: inline-flex; align-items: center; color: inherit; }
 .logo:hover { text-decoration: none; }
 .brand-logo { display: block; width: auto; }
-.brand-logo-sm { height: 42px; }
-.brand-logo-md { height: 68px; }
-.brand-logo-lg { height: 120px; }
+.brand-logo-sm { height: 52px; }
+.brand-logo-md { height: 92px; }
+.brand-logo-lg { height: 170px; }
 
 /* ---------- App shell / sidebar navigation ----------
    Angelehnt an das Justinmind-Dashboard-Template: feste Sidebar in einer
