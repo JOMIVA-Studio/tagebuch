@@ -40,22 +40,28 @@ deshalb kommt **MAMP** zum Einsatz (bringt Apache, PHP und MySQL fertig
 mit, grafischer Installer):
 
 1. MAMP herunterladen: https://www.mamp.info/en/downloads/ (Intel-x86-Paket)
-   und installieren.
+   und installieren. Der Installer legt zwei Apps an: **MAMP** (kostenlos)
+   und **MAMP PRO** (kostenpflichtig, Testversion) - fuer dieses Projekt
+   `/Applications/MAMP/MAMP.app` verwenden (nicht MAMP PRO).
 2. MAMP starten, **Preferences**:
-   - **Ports**: Haekchen bei *"Set Web & MySQL ports to 80 & 3306"*
-     setzen (damit `src/config.php` ohne Anpassung funktioniert).
+   - **Ports**: MAMP nutzt standardmaessig Port 8888 (Apache) / 8889
+     (MySQL) - so ist `src/config.php` bereits eingestellt, keine Aenderung
+     noetig. Wer stattdessen die Standard-Ports 80/3306 moechte, setzt in
+     den Preferences das Haekchen *"Set Web & MySQL ports to 80 & 3306"*
+     und passt `port` in `src/config.php` auf `3306` an.
    - **Apache**: *Document Root* auf den Ordner `public/` dieses Projekts
      stellen (also `.../Neue App/public`).
-   - **PHP**: eine PHP-8.x-Version waehlen.
+   - **PHP**: eine PHP-8.x-Version waehlen (getestet mit 8.3).
 3. **Start Servers** klicken (Ampel wird gruen).
-4. Im Browser `http://localhost/` oeffnen -> leitet zu `/login.php` weiter.
-   Datenbank und Tabellen werden beim ersten Aufruf automatisch angelegt.
+4. Im Browser `http://localhost:8888/` oeffnen -> leitet zu `/login.php`
+   weiter. Datenbank und Tabellen werden beim ersten Aufruf automatisch
+   angelegt.
 5. Unter `/register.php` ein Benutzerkonto anlegen und gleich das erste
    Ziel erfassen.
 
 ### Admin-Bereich
 
-- URL: `http://localhost/admin/login.php`
+- URL: `http://localhost:8888/admin/login.php`
 - Standardzugang: **admin** / **admin123**
 - Bitte direkt nach dem ersten Login unter *Passwort* aendern.
 - Unter *SMTP* die Mailserver-Zugangsdaten hinterlegen (inkl. Testmail-
@@ -64,11 +70,13 @@ mit, grafischer Installer):
   ausloesen oder per Cronjob automatisieren:
 
   ```
-  0 8 * * *  /Applications/MAMP/bin/php/php8.x.x/bin/php \
+  0 8 * * *  /Applications/MAMP/bin/php/php8.3.30/bin/php \
              "/Users/anjajyotistiefel/Documents/Neue App/cron/send_inactivity_reminders.php"
   ```
 
-  (genaue PHP-Version im Ordner `/Applications/MAMP/bin/php/` nachsehen).
+  (getestet und funktionsfaehig mit der oben installierten PHP-Version;
+  bei einem Versions-Wechsel in MAMP den Pfad in `/Applications/MAMP/bin/php/`
+  entsprechend anpassen).
 
 ## Konfiguration
 

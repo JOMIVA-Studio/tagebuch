@@ -5,7 +5,7 @@
 return [
     'db' => [
         'host'    => '127.0.0.1',
-        'port'    => 3306,
+        'port'    => 8889, // MAMP-Standardport fuer MySQL (bei "Set Web & MySQL ports to 80 & 3306" stattdessen 3306)
         'name'    => 'tagebuch_app',
         'user'    => 'root',
         'pass'    => 'root',
