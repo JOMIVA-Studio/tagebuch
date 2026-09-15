@@ -7,7 +7,7 @@
    auf schmalen Screens zur Off-Canvas-Schublade).
    ========================================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
   /* Exakte Logo-Farben (aus den Original-Dateinamen der Logofiles):
@@ -28,7 +28,9 @@
   --color-warning: #c9962e;
   --color-danger: #c1394f;
 
-  --font-heading: 'Playfair Display', Georgia, serif;
+  /* Eine einheitliche Schriftart fuer die ganze Seite (wie in der
+     Sidebar), keine separate Serif-Headline-Schrift mehr. */
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --radius-lg: 20px;
@@ -55,7 +57,8 @@ body {
 
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   line-height: 1.2;
   margin: 0 0 0.5em;
   color: var(--color-ink);
@@ -85,9 +88,9 @@ img, svg { max-width: 100%; }
 .logo { display: inline-flex; align-items: center; color: inherit; }
 .logo:hover { text-decoration: none; }
 .brand-logo { display: block; width: auto; }
-.brand-logo-sm { height: 32px; }
-.brand-logo-md { height: 46px; }
-.brand-logo-lg { height: 84px; }
+.brand-logo-sm { height: 42px; }
+.brand-logo-md { height: 68px; }
+.brand-logo-lg { height: 120px; }
 
 /* ---------- App shell / sidebar navigation ----------
    Angelehnt an das Justinmind-Dashboard-Template: feste Sidebar in einer
