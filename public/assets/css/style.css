@@ -10,19 +10,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --color-green: #4caf50;
-  --color-green-dark: #3d8b40;
-  --color-purple: #5b3fa0;
-  --color-purple-dark: #46307d;
-  --color-magenta: #9c3fa6;
-  --color-magenta-dark: #7c3184;
+  /* Genau die drei Logo-Farben: Gruen (Hauptlogo), Violett und Magenta
+     (Logo-Varianten). Visuell aus den Logo-Bildern abgeglichen - falls du
+     exakte Hex-Werte aus deinem Design-Tool hast, sag Bescheid, dann
+     stelle ich hier pixelgenau darauf um. */
+  --color-green: #55a852;
+  --color-green-dark: #448642;
+  --color-purple: #5a3b9b;
+  --color-purple-dark: #472e7a;
+  --color-magenta: #9b3d9c;
+  --color-magenta-dark: #7a307a;
   --color-dark: #201a2b;
   --color-ink: #241f2e;
   --color-muted: #6b6478;
   --color-cream: #faf8fb;
   --color-card: #ffffff;
   --color-border: #ece7f0;
-  --color-success: #4caf50;
+  --color-success: #55a852;
   --color-warning: #c9962e;
   --color-danger: #c1394f;
 
