@@ -125,7 +125,7 @@ require __DIR__ . '/partials/header.php';
         $target = (int) $goal['frequency_target'];
         $percent = $target > 0 ? min(100, (int) round($done / $target * 100)) : 0;
     ?>
-      <a href="/goal.php?id=<?= (int) $goal['id'] ?>" class="card goal-card card-accent-top <?= ['weekly'=>'','daily'=>'purple','monthly'=>'magenta'][$goal['frequency_type']] ?>">
+      <a href="/goal.php?id=<?= (int) $goal['id'] ?>" class="card goal-card card-accent-left <?= ['weekly'=>'','daily'=>'purple','monthly'=>'magenta'][$goal['frequency_type']] ?>">
         <div class="goal-title">
           <h3 class="mb-0"><?= e($goal['title']) ?></h3>
         </div>

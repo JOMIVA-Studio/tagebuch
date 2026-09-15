@@ -10,10 +10,21 @@ if (!defined('APP_BOOTSTRAPPED')) {
  *   $heroBadge    string  kleines Label ueber dem Titel
  *   $heroTitle    string  grosse Ueberschrift im Hero
  *   $heroSubtitle string  optionaler Untertext
+ *
+ * Eingeloggte User bekommen die Sidebar-Navigation (angelehnt an das
+ * Justinmind-Referenz-Template), ausgeloggte Besucher (Login/Registrieren)
+ * eine schlanke, zentrierte Seite ohne Sidebar.
  */
 $appName = app_config()['app_name'];
 $loggedInUser = current_user();
 $currentScript = basename($_SERVER['SCRIPT_NAME']);
+$usesSidebarShell = $loggedInUser !== null;
+
+$navItems = [
+    ['href' => 'dashboard.php', 'label' => 'Kalender', 'icon' => 'calendar'],
+    ['href' => 'goals.php',     'label' => 'Ziele',    'icon' => 'target', 'alsoActive' => 'goal.php'],
+    ['href' => 'profile.php',   'label' => 'Profil',   'icon' => 'user'],
+];
 ?><!doctype html>
 <html lang="de">
 <head>
@@ -24,29 +35,57 @@ $currentScript = basename($_SERVER['SCRIPT_NAME']);
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="container topbar-inner">
-    <a href="/<?= $loggedInUser ? 'dashboard.php' : '' ?>" class="logo">
+<?php if ($usesSidebarShell): ?>
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+  <aside class="sidebar" id="sidebar">
+    <a href="/dashboard.php" class="logo sidebar-logo">
       <span class="logo-ring"><span>A</span></span>
       <span class="logo-word"><?= e($appName) ?></span>
     </a>
 
-    <button class="nav-toggle" type="button" aria-label="Menu" onclick="document.getElementById('mainNav').classList.toggle('open')"></button>
-
-    <nav class="main-nav" id="mainNav">
-      <?php if ($loggedInUser): ?>
-        <a href="/dashboard.php" class="<?= $currentScript === 'dashboard.php' ? 'active' : '' ?>">Kalender</a>
-        <a href="/goals.php" class="<?= $currentScript === 'goals.php' || $currentScript === 'goal.php' ? 'active' : '' ?>">Ziele</a>
-        <a href="/profile.php" class="<?= $currentScript === 'profile.php' ? 'active' : '' ?>">Profil</a>
-        <a href="/logout.php" class="btn btn-ghost btn-sm">Abmelden</a>
-      <?php else: ?>
-        <a href="/login.php" class="<?= $currentScript === 'login.php' ? 'active' : '' ?>">Anmelden</a>
-        <a href="/register.php" class="btn btn-primary btn-sm">Registrieren</a>
-      <?php endif; ?>
+    <nav class="sidebar-nav">
+      <?php foreach ($navItems as $item):
+          $isActive = $currentScript === $item['href'] || (isset($item['alsoActive']) && $currentScript === $item['alsoActive']);
+      ?>
+        <a href="/<?= $item['href'] ?>" class="sidebar-link <?= $isActive ? 'active' : '' ?>">
+          <?= icon($item['icon']) ?><span><?= e($item['label']) ?></span>
+        </a>
+      <?php endforeach; ?>
     </nav>
-  </div>
-</header>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar"><?= e(mb_strtoupper(mb_substr($loggedInUser['name'], 0, 1))) ?></div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name"><?= e($loggedInUser['name']) ?></div>
+          <div class="sidebar-user-email"><?= e($loggedInUser['email']) ?></div>
+        </div>
+      </div>
+      <a href="/logout.php" class="sidebar-link"><?= icon('logout') ?><span>Abmelden</span></a>
+    </div>
+  </aside>
+
+  <div class="app-main">
+    <div class="app-topbar">
+      <button class="nav-toggle" type="button" aria-label="Menu" onclick="toggleSidebar(true)"></button>
+      <a href="/dashboard.php" class="logo">
+        <span class="logo-ring"><span>A</span></span>
+        <span class="logo-word"><?= e($appName) ?></span>
+      </a>
+    </div>
+    <main>
+<?php else: ?>
 <main>
+  <div class="container" style="max-width: 460px; padding-top: 40px; padding-bottom: 0;">
+    <a href="/login.php" class="logo" style="color: var(--color-ink); justify-content: center; margin-bottom: 28px;">
+      <span class="logo-ring"><span>A</span></span>
+      <span class="logo-word"><?= e($appName) ?></span>
+    </a>
+  </div>
+<?php endif; ?>
 <?php if (!empty($heroTone)): ?>
   <div class="page-hero tone-<?= e($heroTone) ?>">
     <div class="container">
@@ -56,7 +95,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME']);
     </div>
   </div>
 <?php endif; ?>
-  <div class="container" style="padding-bottom: 20px;">
+  <div class="container" style="padding-bottom: 20px; <?= $usesSidebarShell ? '' : 'max-width: 460px; padding-top: 0;' ?>">
     <?php foreach (get_flashes() as $flash): ?>
       <div class="flash flash-<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
     <?php endforeach; ?>

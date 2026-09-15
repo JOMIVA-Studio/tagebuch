@@ -6,6 +6,15 @@ if (!defined('APP_BOOTSTRAPPED')) {
 $appName = app_config()['app_name'];
 $admin = current_admin();
 $currentScript = basename($_SERVER['SCRIPT_NAME']);
+
+$navItems = [
+    ['href' => 'index.php',      'label' => 'Uebersicht',    'icon' => 'grid'],
+    ['href' => 'questions.php',  'label' => 'Fragen',        'icon' => 'list'],
+    ['href' => 'templates.php',  'label' => 'Mail-Vorlagen', 'icon' => 'mail', 'alsoActive' => 'template_edit.php'],
+    ['href' => 'smtp.php',       'label' => 'SMTP',          'icon' => 'server'],
+    ['href' => 'reminders.php',  'label' => 'Erinnerungen',  'icon' => 'bell'],
+    ['href' => 'password.php',   'label' => 'Passwort',      'icon' => 'lock'],
+];
 ?><!doctype html>
 <html lang="de">
 <head>
@@ -16,28 +25,48 @@ $currentScript = basename($_SERVER['SCRIPT_NAME']);
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-<header class="topbar admin-topbar">
-  <div class="container topbar-inner">
-    <a href="/admin/" class="logo">
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+  <aside class="sidebar admin-sidebar" id="sidebar">
+    <a href="/admin/index.php" class="logo sidebar-logo">
       <span class="logo-ring"><span>A</span></span>
       <span class="logo-word">Administration</span>
     </a>
-    <button class="nav-toggle" type="button" aria-label="Menu" onclick="document.getElementById('adminNav').classList.toggle('open')"></button>
-    <nav class="main-nav" id="adminNav">
-      <?php if ($admin): ?>
-        <a href="/admin/index.php" class="<?= $currentScript === 'index.php' ? 'active' : '' ?>">Uebersicht</a>
-        <a href="/admin/questions.php" class="<?= $currentScript === 'questions.php' ? 'active' : '' ?>">Fragen</a>
-        <a href="/admin/templates.php" class="<?= $currentScript === 'templates.php' ? 'active' : '' ?>">Mail-Vorlagen</a>
-        <a href="/admin/smtp.php" class="<?= $currentScript === 'smtp.php' ? 'active' : '' ?>">SMTP</a>
-        <a href="/admin/reminders.php" class="<?= $currentScript === 'reminders.php' ? 'active' : '' ?>">Erinnerungen</a>
-        <a href="/admin/password.php" class="<?= $currentScript === 'password.php' ? 'active' : '' ?>">Passwort</a>
-        <a href="/admin/logout.php" class="btn btn-ghost btn-sm">Abmelden</a>
-      <?php endif; ?>
+
+    <nav class="sidebar-nav">
+      <?php foreach ($navItems as $item):
+          $isActive = $currentScript === $item['href'] || (isset($item['alsoActive']) && $currentScript === $item['alsoActive']);
+      ?>
+        <a href="/admin/<?= $item['href'] ?>" class="sidebar-link <?= $isActive ? 'active' : '' ?>">
+          <?= icon($item['icon']) ?><span><?= e($item['label']) ?></span>
+        </a>
+      <?php endforeach; ?>
     </nav>
-  </div>
-</header>
-<main>
-  <div class="container" style="padding-block: 28px 20px;">
-    <?php foreach (get_flashes() as $flash): ?>
-      <div class="flash flash-<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
-    <?php endforeach; ?>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar"><?= e(mb_strtoupper(mb_substr($admin['username'], 0, 1))) ?></div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name"><?= e($admin['username']) ?></div>
+          <div class="sidebar-user-email">Administration</div>
+        </div>
+      </div>
+      <a href="/admin/logout.php" class="sidebar-link"><?= icon('logout') ?><span>Abmelden</span></a>
+    </div>
+  </aside>
+
+  <div class="app-main">
+    <div class="app-topbar">
+      <button class="nav-toggle" type="button" aria-label="Menu" onclick="toggleSidebar(true)"></button>
+      <a href="/admin/index.php" class="logo">
+        <span class="logo-ring"><span>A</span></span>
+        <span class="logo-word">Administration</span>
+      </a>
+    </div>
+    <main>
+      <div class="container" style="padding-block: 28px 20px;">
+        <?php foreach (get_flashes() as $flash): ?>
+          <div class="flash flash-<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
+        <?php endforeach; ?>
