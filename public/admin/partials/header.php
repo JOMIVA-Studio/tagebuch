@@ -28,9 +28,9 @@ $navItems = [
 <div class="app-shell">
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
   <aside class="sidebar admin-sidebar" id="sidebar">
-    <a href="/admin/index.php" class="logo sidebar-logo">
-      <span class="logo-ring"><span>A</span></span>
-      <span class="logo-word">Administration</span>
+    <a href="/admin/index.php" class="logo sidebar-logo" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+      <img class="brand-logo brand-logo-md" src="/assets/img/logo-white.svg" alt="<?= e($appName) ?>">
+      <span class="sidebar-admin-label">Administration</span>
     </a>
 
     <nav class="sidebar-nav">
@@ -61,8 +61,7 @@ $navItems = [
     <div class="app-topbar">
       <button class="nav-toggle" type="button" aria-label="Menu" onclick="toggleSidebar(true)"></button>
       <a href="/admin/index.php" class="logo">
-        <span class="logo-ring"><span>A</span></span>
-        <span class="logo-word">Administration</span>
+        <img class="brand-logo brand-logo-sm" src="/assets/img/logo-black.svg" alt="<?= e($appName) ?>">
       </a>
     </div>
     <main>

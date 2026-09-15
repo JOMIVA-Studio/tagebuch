@@ -40,8 +40,7 @@ $navItems = [
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
   <aside class="sidebar" id="sidebar">
     <a href="/dashboard.php" class="logo sidebar-logo">
-      <span class="logo-ring"><span>A</span></span>
-      <span class="logo-word"><?= e($appName) ?></span>
+      <img class="brand-logo brand-logo-md" src="/assets/img/logo-white.svg" alt="<?= e($appName) ?>">
     </a>
 
     <nav class="sidebar-nav">
@@ -72,17 +71,15 @@ $navItems = [
     <div class="app-topbar">
       <button class="nav-toggle" type="button" aria-label="Menu" onclick="toggleSidebar(true)"></button>
       <a href="/dashboard.php" class="logo">
-        <span class="logo-ring"><span>A</span></span>
-        <span class="logo-word"><?= e($appName) ?></span>
+        <img class="brand-logo brand-logo-sm" src="/assets/img/logo-black.svg" alt="<?= e($appName) ?>">
       </a>
     </div>
     <main>
 <?php else: ?>
 <main>
-  <div class="container" style="max-width: 460px; padding-top: 40px; padding-bottom: 0;">
-    <a href="/login.php" class="logo" style="color: var(--color-ink); justify-content: center; margin-bottom: 28px;">
-      <span class="logo-ring"><span>A</span></span>
-      <span class="logo-word"><?= e($appName) ?></span>
+  <div class="container" style="max-width: 460px; padding-top: 40px; padding-bottom: 0; text-align: center;">
+    <a href="/login.php" class="logo" style="justify-content: center; margin-bottom: 28px;">
+      <img class="brand-logo brand-logo-lg" style="margin-inline: auto;" src="/assets/img/logo-black.svg" alt="<?= e($appName) ?>">
     </a>
   </div>
 <?php endif; ?>

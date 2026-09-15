@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="container">
     <div class="stack-narrow card">
       <div class="text-center">
-        <span class="logo-ring" style="margin-bottom:14px;"><span>A</span></span>
+        <img class="brand-logo brand-logo-lg" style="margin: 0 auto 14px;" src="/assets/img/logo-black.svg" alt="Logo">
       </div>
       <h2 class="text-center">Administration</h2>
       <p class="text-muted text-center small">Separater, session-unabhaengiger Zugang.</p>
