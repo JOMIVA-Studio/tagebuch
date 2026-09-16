@@ -92,9 +92,12 @@ require __DIR__ . '/partials/header.php';
 
 <div class="flex-between">
   <h2 class="mb-0">Aktive Ziele</h2>
-  <?php if (!$showForm): ?>
-    <a href="/goals.php?new=1" class="btn btn-primary btn-sm">+ Neues Ziel</a>
-  <?php endif; ?>
+  <div class="flex gap-sm">
+    <a href="/vision.php" class="btn btn-ghost btn-sm"><?= icon('image') ?> Visionboard</a>
+    <?php if (!$showForm): ?>
+      <a href="/goals.php?new=1" class="btn btn-primary btn-sm">+ Neues Ziel</a>
+    <?php endif; ?>
+  </div>
 </div>
 
 <?php if ($showForm): ?>

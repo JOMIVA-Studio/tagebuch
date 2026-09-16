@@ -151,6 +151,8 @@ require __DIR__ . '/partials/header.php';
 ?>
 <link rel="stylesheet" href="/assets/css/vision.css">
 
+<p><a href="/goals.php">&larr; Zurueck zu deinen Zielen</a></p>
+
 <?php foreach ($errors as $error): ?>
   <div class="flash flash-error"><?= e($error) ?></div>
 <?php endforeach; ?>

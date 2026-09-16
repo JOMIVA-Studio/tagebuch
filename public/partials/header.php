@@ -22,9 +22,8 @@ $usesSidebarShell = $loggedInUser !== null;
 
 $navItems = [
     ['href' => 'dashboard.php', 'label' => 'Tagebuch', 'icon' => 'home', 'alsoActive' => 'day.php'],
-    ['href' => 'goals.php',     'label' => 'Ziele',      'icon' => 'target', 'alsoActive' => 'goal.php'],
+    ['href' => 'goals.php',     'label' => 'Ziele',      'icon' => 'target', 'alsoActive' => ['goal.php', 'vision.php']],
     ['href' => 'tracker.php',   'label' => 'Tracker',    'icon' => 'droplet', 'alsoActive' => ['water.php', 'cycle.php', 'sleep.php']],
-    ['href' => 'vision.php',    'label' => 'Visionboard', 'icon' => 'image'],
     ['href' => 'profile.php',   'label' => 'Profil',     'icon' => 'user'],
 ];
 ?><!doctype html>
