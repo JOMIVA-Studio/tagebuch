@@ -12,6 +12,7 @@ $navItems = [
     ['href' => 'quotes.php',     'label' => 'Sprueche',      'icon' => 'quote'],
     ['href' => 'templates.php',  'label' => 'Mail-Vorlagen', 'icon' => 'mail', 'alsoActive' => 'template_edit.php'],
     ['href' => 'smtp.php',       'label' => 'SMTP',          'icon' => 'server'],
+    ['href' => 'ai_settings.php', 'label' => 'KI-Bilder',    'icon' => 'image'],
     ['href' => 'reminders.php',  'label' => 'Erinnerungen',  'icon' => 'bell'],
     ['href' => 'password.php',   'label' => 'Passwort',      'icon' => 'lock'],
 ];

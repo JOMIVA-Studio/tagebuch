@@ -77,6 +77,7 @@ function icon(string $name): string
         'moon'     => '<path d="M16.5 12.6A6.8 6.8 0 0 1 7.4 3.5a7 7 0 1 0 9.1 9.1Z"/>',
         'quote'    => '<path d="M4 12V8.5A2.5 2.5 0 0 1 6.5 6H7"/><path d="M4 12h3v3.5A1.5 1.5 0 0 1 5.5 17H4"/><path d="M12 12V8.5A2.5 2.5 0 0 1 14.5 6H15"/><path d="M12 12h3v3.5a1.5 1.5 0 0 1-1.5 1.5H12"/>',
         'sun'      => '<circle cx="10" cy="10" r="3.6"/><path d="M10 2.5v2M10 15.5v2M17.5 10h-2M4.5 10h-2M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4M15.3 15.3l-1.4-1.4M6.1 6.1 4.7 4.7"/>',
+        'image'    => '<rect x="2.5" y="4" width="15" height="12" rx="2"/><circle cx="7" cy="8.5" r="1.4"/><path d="M4 15l4.2-4.2a1.5 1.5 0 0 1 2.1 0L14 14.5M12.5 13 14 11.5a1.5 1.5 0 0 1 2.1 0l1.4 1.4"/>',
     ];
     $body = $paths[$name] ?? $paths['grid'];
     return '<svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $body . '</svg>';

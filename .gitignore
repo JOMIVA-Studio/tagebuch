@@ -1,3 +1,5 @@
 src/config.php
 .DS_Store
 *.log
+public/uploads/vision/*
+!public/uploads/vision/.gitkeep

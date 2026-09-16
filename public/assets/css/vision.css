@@ -1,0 +1,24 @@
+/* ---------- Visionboard (eigenstaendiges Stylesheet, siehe vision.php) ---------- */
+.vision-board {
+  position: relative; width: 100%; min-height: 60vh; border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border); overflow: hidden; touch-action: none;
+}
+.vision-item {
+  position: absolute; cursor: grab; user-select: none; touch-action: none;
+  box-shadow: 0 8px 20px rgba(32, 26, 43, 0.18); border-radius: 8px; overflow: hidden;
+}
+.vision-item:active { cursor: grabbing; }
+.vision-item img { display: block; width: 100%; height: auto; pointer-events: none; border-radius: 8px; }
+.vision-delete-form { position: absolute; top: 4px; right: 4px; margin: 0; }
+.vision-delete {
+  width: 22px; height: 22px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(32, 26, 43, 0.65); color: #fff; font-size: 0.9rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.vision-empty {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 20px; color: var(--color-muted); max-width: 320px; margin: auto;
+}
+@media (max-width: 650px) {
+  .vision-board { min-height: 50vh; }
+}
