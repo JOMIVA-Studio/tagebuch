@@ -85,6 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if ($action === 'set_background_style') {
+        $style = $_POST['style'] ?? '';
+        if (in_array($style, ['cork', 'chalk', 'metal'], true)) {
+            $stmt = $pdo->prepare('UPDATE vision_boards SET background_type = :style WHERE user_id = :uid');
+            $stmt->execute(['style' => $style, 'uid' => $user['id']]);
+            flash('success', 'Hintergrund gespeichert.');
+        }
+        redirect('/vision.php');
+    }
+
     if ($action === 'set_background_color') {
         $color = $_POST['background_color'] ?? '#faf8fb';
         if (preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
@@ -120,10 +130,17 @@ $stmt->execute(['uid' => $user['id']]);
 $items = $stmt->fetchAll();
 
 $presetColors = ['#faf8fb', '#fdf6ec', '#eef6ee', '#eef1fb', '#201a2b', '#ffffff'];
+$boardStyles = ['cork' => 'Korkwand', 'chalk' => 'Wandtafel', 'metal' => 'Magnetwand'];
 
-$boardStyle = $board['background_type'] === 'image' && $board['background_image']
-    ? 'background-image:url(' . e($board['background_image']) . '); background-size:cover; background-position:center;'
-    : 'background:' . e($board['background_color']) . ';';
+$boardClass = '';
+$boardStyle = '';
+if (array_key_exists($board['background_type'], $boardStyles)) {
+    $boardClass = 'vision-bg-' . $board['background_type'];
+} elseif ($board['background_type'] === 'image' && $board['background_image']) {
+    $boardStyle = 'background-image:url(' . e($board['background_image']) . '); background-size:cover; background-position:center;';
+} else {
+    $boardStyle = 'background:' . e($board['background_color']) . ';';
+}
 
 $pageTitle = 'Visionboard';
 $heroTone = 'magenta';
@@ -153,7 +170,18 @@ require __DIR__ . '/partials/header.php';
 
   <div class="card">
     <h3>Hintergrund</h3>
-    <form method="post" class="flex gap-sm mb-0" style="flex-wrap:wrap;">
+    <form method="post" class="flex gap-md mb-0" style="flex-wrap:wrap;">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="set_background_style">
+      <?php foreach ($boardStyles as $styleKey => $styleLabel): ?>
+        <button type="submit" name="style" value="<?= $styleKey ?>" class="vision-style-swatch vision-bg-<?= $styleKey ?> <?= $board['background_type'] === $styleKey ? 'selected' : '' ?>" aria-label="<?= $styleLabel ?>">
+          <span><?= $styleLabel ?></span>
+        </button>
+      <?php endforeach; ?>
+    </form>
+
+    <p class="small text-muted mt-md mb-0">Oder eigene Farbe/Bild:</p>
+    <form method="post" class="flex gap-sm mt-sm" style="flex-wrap:wrap;">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="set_background_color">
       <?php foreach ($presetColors as $color): ?>
@@ -184,7 +212,7 @@ require __DIR__ . '/partials/header.php';
   </div>
 </div>
 
-<div id="visionBoard" class="vision-board mt-md" style="<?= $boardStyle ?>">
+<div id="visionBoard" class="vision-board mt-md <?= e($boardClass) ?>" style="<?= $boardStyle ?>">
   <?php foreach ($items as $item): ?>
     <div class="vision-item" data-id="<?= (int) $item['id'] ?>" style="left:<?= (int) $item['pos_x'] ?>px; top:<?= (int) $item['pos_y'] ?>px; width:<?= (int) $item['width'] ?>px; z-index:<?= (int) $item['z_index'] ?>;">
       <img src="<?= e($item['image_path']) ?>" alt="<?= e($item['caption'] ?? '') ?>" draggable="false">
