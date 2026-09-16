@@ -4,7 +4,7 @@ require_admin();
 
 $pdo = db();
 $userCount = (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
-$questionCount = (int) $pdo->query('SELECT COUNT(*) FROM questions WHERE is_active = 1')->fetchColumn();
+$quoteCount = (int) $pdo->query('SELECT COUNT(*) FROM quotes WHERE is_active = 1')->fetchColumn();
 $entryCount = (int) $pdo->query('SELECT COUNT(*) FROM diary_entries')->fetchColumn();
 $goalCount = (int) $pdo->query('SELECT COUNT(*) FROM goals WHERE is_active = 1')->fetchColumn();
 
@@ -19,7 +19,7 @@ require __DIR__ . '/partials/header.php';
 
 <div class="card-grid">
   <div class="card"><div class="text-muted small">User</div><h2 class="mt-0"><?= $userCount ?></h2></div>
-  <div class="card"><div class="text-muted small">Aktive Fragen</div><h2 class="mt-0"><?= $questionCount ?></h2></div>
+  <div class="card"><div class="text-muted small">Aktive Sprueche</div><h2 class="mt-0"><?= $quoteCount ?></h2></div>
   <div class="card"><div class="text-muted small">Tagebucheintraege</div><h2 class="mt-0"><?= $entryCount ?></h2></div>
   <div class="card"><div class="text-muted small">Aktive Ziele</div><h2 class="mt-0"><?= $goalCount ?></h2></div>
 </div>

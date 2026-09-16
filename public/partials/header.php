@@ -21,8 +21,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME']);
 $usesSidebarShell = $loggedInUser !== null;
 
 $navItems = [
-    ['href' => 'dashboard.php', 'label' => 'Startseite', 'icon' => 'home'],
-    ['href' => 'routines.php',  'label' => 'Routinen',   'icon' => 'sun', 'alsoActive' => ['morning.php', 'evening.php']],
+    ['href' => 'dashboard.php', 'label' => 'Startseite', 'icon' => 'home', 'alsoActive' => 'day.php'],
     ['href' => 'goals.php',     'label' => 'Ziele',      'icon' => 'target', 'alsoActive' => 'goal.php'],
     ['href' => 'tracker.php',   'label' => 'Tracker',    'icon' => 'droplet', 'alsoActive' => ['water.php', 'cycle.php', 'sleep.php']],
     ['href' => 'profile.php',   'label' => 'Profil',     'icon' => 'user'],

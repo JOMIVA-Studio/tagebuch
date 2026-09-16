@@ -13,33 +13,41 @@ $dateStr = $date->format('Y-m-d');
 
 $pdo = db();
 
-$stmt = $pdo->prepare('SELECT * FROM questions WHERE is_active = 1 ORDER BY sort_order, id');
-$stmt->execute();
-$questions = $stmt->fetchAll();
-
 $stmt = $pdo->prepare('SELECT * FROM diary_entries WHERE user_id = :uid AND entry_date = :date');
 $stmt->execute(['uid' => $user['id'], 'date' => $dateStr]);
 $entry = $stmt->fetch();
 
-$answers = [];
-if ($entry) {
-    $stmt = $pdo->prepare('SELECT question_id, answer_text FROM diary_answers WHERE diary_entry_id = :eid');
-    $stmt->execute(['eid' => $entry['id']]);
-    foreach ($stmt->fetchAll() as $row) {
-        $answers[(int) $row['question_id']] = $row['answer_text'];
-    }
-}
-
 $freeText = $entry['free_text'] ?? '';
+$gratitude = $entry['gratitude'] ?? '';
+$intention = $entry['intention'] ?? '';
+$affirmation = $entry['affirmation'] ?? '';
+$niceMoment = $entry['nice_moment'] ?? '';
+$learning = $entry['learning'] ?? '';
+
 $stmt = $pdo->prepare('SELECT COALESCE(SUM(amount_ml), 0) FROM water_logs WHERE user_id = :uid AND DATE(logged_at) = :date');
-$stmt->execute(['uid'=>$user['id'], 'date'=>$dateStr]);
+$stmt->execute(['uid' => $user['id'], 'date' => $dateStr]);
 $dayWaterTotal = (int) $stmt->fetchColumn();
+
 $cycleMarked = false;
 if ($user['gender'] === 'weiblich') {
     $stmt = $pdo->prepare('SELECT COUNT(*) FROM cycle_days WHERE user_id = :uid AND day_date = :date');
-    $stmt->execute(['uid'=>$user['id'], 'date'=>$dateStr]);
+    $stmt->execute(['uid' => $user['id'], 'date' => $dateStr]);
     $cycleMarked = (bool) $stmt->fetchColumn();
 }
+
+$stmt = $pdo->prepare('SELECT * FROM goals WHERE user_id = :uid AND is_active = 1 ORDER BY created_at');
+$stmt->execute(['uid' => $user['id']]);
+$goals = $stmt->fetchAll();
+
+$goalStatusToday = [];
+if ($goals) {
+    $stmt = $pdo->prepare('SELECT goal_id, status FROM goal_logs WHERE goal_id IN (SELECT id FROM goals WHERE user_id = :uid) AND log_date = :date');
+    $stmt->execute(['uid' => $user['id'], 'date' => $dateStr]);
+    foreach ($stmt->fetchAll() as $row) {
+        $goalStatusToday[(int) $row['goal_id']] = $row['status'];
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $action = $_POST['action'] ?? 'save_entry';
@@ -64,60 +72,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('/day.php?date=' . $dateStr);
     }
 
-    $freeText = trim($_POST['free_text'] ?? '');
-
-    $pdo->beginTransaction();
-    try {
-        if ($entry) {
-            $stmt = $pdo->prepare('UPDATE diary_entries SET free_text = :text WHERE id = :id');
-            $stmt->execute(['text' => $freeText, 'id' => $entry['id']]);
-            $entryId = (int) $entry['id'];
-        } else {
-            $stmt = $pdo->prepare(
-                'INSERT INTO diary_entries (user_id, entry_date, free_text) VALUES (:uid, :date, :text)'
-            );
-            $stmt->execute(['uid' => $user['id'], 'date' => $dateStr, 'text' => $freeText]);
-            $entryId = (int) $pdo->lastInsertId();
-        }
-
-        $upsert = $pdo->prepare(
-            'INSERT INTO diary_answers (diary_entry_id, question_id, answer_text)
-             VALUES (:eid, :qid, :answer)
-             ON DUPLICATE KEY UPDATE answer_text = VALUES(answer_text)'
+    if ($action === 'save_goals') {
+        $checked = array_flip((array) ($_POST['done'] ?? []));
+        $stmt = $pdo->prepare(
+            'INSERT INTO goal_logs (goal_id, log_date, status) VALUES (:gid, :date, :status)
+             ON DUPLICATE KEY UPDATE status = VALUES(status)'
         );
-
-        foreach ($questions as $question) {
-            $qid = (int) $question['id'];
-            $answer = trim((string) ($_POST['question'][$qid] ?? ''));
-            $upsert->execute(['eid' => $entryId, 'qid' => $qid, 'answer' => $answer]);
-            $answers[$qid] = $answer;
+        foreach ($goals as $goal) {
+            $gid = (int) $goal['id'];
+            $status = isset($checked[$gid]) ? 'done' : 'not_done';
+            $stmt->execute(['gid' => $gid, 'date' => $dateStr, 'status' => $status]);
         }
-
-        $pdo->commit();
-        flash('success', 'Eintrag fuer den ' . $date->format('d.m.Y') . ' gespeichert.');
+        flash('success', 'Ziele fuer diesen Tag gespeichert.');
         redirect('/day.php?date=' . $dateStr);
-    } catch (Throwable $e) {
-        $pdo->rollBack();
-        flash('error', 'Der Eintrag konnte nicht gespeichert werden.');
     }
+
+    $freeText = trim($_POST['free_text'] ?? '');
+    $gratitude = trim($_POST['gratitude'] ?? '');
+    $intention = trim($_POST['intention'] ?? '');
+    $affirmation = trim($_POST['affirmation'] ?? '');
+    $niceMoment = trim($_POST['nice_moment'] ?? '');
+    $learning = trim($_POST['learning'] ?? '');
+
+    $fields = [
+        'free_text' => $freeText, 'gratitude' => $gratitude, 'intention' => $intention,
+        'affirmation' => $affirmation, 'nice_moment' => $niceMoment, 'learning' => $learning,
+    ];
+
+    if ($entry) {
+        $stmt = $pdo->prepare(
+            'UPDATE diary_entries SET free_text = :free_text, gratitude = :gratitude, intention = :intention,
+                affirmation = :affirmation, nice_moment = :nice_moment, learning = :learning
+             WHERE id = :id'
+        );
+        $stmt->execute($fields + ['id' => $entry['id']]);
+    } else {
+        $stmt = $pdo->prepare(
+            'INSERT INTO diary_entries (user_id, entry_date, free_text, gratitude, intention, affirmation, nice_moment, learning)
+             VALUES (:uid, :date, :free_text, :gratitude, :intention, :affirmation, :nice_moment, :learning)'
+        );
+        $stmt->execute($fields + ['uid' => $user['id'], 'date' => $dateStr]);
+    }
+
+    flash('success', 'Eintrag fuer den ' . $date->format('d.m.Y') . ' gespeichert.');
+    redirect('/day.php?date=' . $dateStr);
 }
 
-$pageTitle = 'Eintrag ' . $date->format('d.m.Y');
+$pageTitle = 'Tagebuch ' . $date->format('d.m.Y');
 $heroTone = 'purple';
 $heroBadge = 'Tagebuch';
 $heroTitle = $date->format('d.m.Y');
-$heroSubtitle = 'Beantworte die Fragen und halte fest, was dich heute beschaeftigt.';
+$heroSubtitle = 'Dein Tag - morgens, abends und alles dazwischen.';
 require __DIR__ . '/partials/header.php';
 ?>
 
 <p><a href="/dashboard.php">&larr; Zurueck zum Kalender</a></p>
 
 <div class="card card-accent-left magenta">
-  <h2>Deine Tracker für diesen Tag</h2>
-  <p class="small text-muted">Ein Klick genuegt - ohne etwas zu schreiben, kein separates Speichern noetig.</p>
+  <h2>Tracker</h2>
 
   <div class="field mb-0">
-    <label class="mb-0">Wasser <span class="text-muted small">(heute: <?= $dayWaterTotal ?> ml)</span></label>
+    <label class="mb-0">Wasser <span class="text-muted small">(<?= $dayWaterTotal ?> ml)</span></label>
     <form method="post" class="flex gap-sm mt-sm" style="flex-wrap:wrap;">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="track_water">
@@ -138,51 +153,64 @@ require __DIR__ . '/partials/header.php';
     </form>
   <?php endif; ?>
 
-  <p class="small mt-md mb-0"><a href="/sleep.php?date=<?= e($dateStr) ?>">Schlaf für diese Nacht erfassen &rarr;</a></p>
+  <?php if ($goals): ?>
+    <div class="field mb-0 mt-md">
+      <label class="mb-0">Ziele</label>
+      <form method="post" class="mt-sm">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="save_goals">
+        <?php foreach ($goals as $goal): $gid = (int) $goal['id']; ?>
+          <label class="checkbox-row mt-sm">
+            <input type="checkbox" name="done[]" value="<?= $gid ?>" <?= ($goalStatusToday[$gid] ?? '') === 'done' ? 'checked' : '' ?>>
+            <?= e($goal['title']) ?>
+          </label>
+        <?php endforeach; ?>
+        <button type="submit" class="btn btn-ghost btn-sm mt-md">Ziele speichern</button>
+      </form>
+    </div>
+  <?php endif; ?>
+
+  <p class="small mt-md mb-0"><a href="/sleep.php?date=<?= e($dateStr) ?>">Schlaf fuer diese Nacht erfassen &rarr;</a></p>
 </div>
 
 <form method="post">
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="save_entry">
 
-  <?php foreach ($questions as $question):
-      $qid = (int) $question['id'];
-      $value = $answers[$qid] ?? '';
-  ?>
-    <div class="card">
-      <label for="q<?= $qid ?>" style="font-weight:700; display:block; margin-bottom:12px;"><?= e($question['question_text']) ?></label>
-
-      <?php if ($question['answer_type'] === 'scale_1_5'): ?>
-        <div class="scale-row">
-          <?php for ($i = 1; $i <= 5; $i++): ?>
-            <label>
-              <input type="radio" name="question[<?= $qid ?>]" value="<?= $i ?>" <?= (string) $value === (string) $i ? 'checked' : '' ?>>
-              <?= $i ?>
-            </label>
-          <?php endfor; ?>
-        </div>
-
-      <?php elseif ($question['answer_type'] === 'yesno'): ?>
-        <div class="yesno-row">
-          <label><input type="radio" name="question[<?= $qid ?>]" value="ja" <?= $value === 'ja' ? 'checked' : '' ?>> Ja</label>
-          <label><input type="radio" name="question[<?= $qid ?>]" value="nein" <?= $value === 'nein' ? 'checked' : '' ?>> Nein</label>
-        </div>
-
-      <?php elseif ($question['answer_type'] === 'number'): ?>
-        <input type="number" step="any" id="q<?= $qid ?>" name="question[<?= $qid ?>]" value="<?= e($value) ?>">
-
-      <?php else: ?>
-        <textarea id="q<?= $qid ?>" name="question[<?= $qid ?>]" rows="2"><?= e($value) ?></textarea>
-      <?php endif; ?>
+  <div class="card card-accent-top">
+    <h2 class="mb-0">Morgens</h2>
+    <div class="field mt-md">
+      <label for="gratitude">Wofuer bin ich dankbar?</label>
+      <textarea id="gratitude" name="gratitude" rows="2"><?= e($gratitude) ?></textarea>
     </div>
-  <?php endforeach; ?>
+    <div class="field">
+      <label for="intention">Was nehme ich mir heute vor?</label>
+      <textarea id="intention" name="intention" rows="2"><?= e($intention) ?></textarea>
+    </div>
+    <div class="field mb-0">
+      <label for="affirmation">Meine Affirmation</label>
+      <textarea id="affirmation" name="affirmation" rows="2"><?= e($affirmation) ?></textarea>
+    </div>
+  </div>
+
+  <div class="card card-accent-top purple">
+    <h2 class="mb-0">Abends</h2>
+    <div class="field mt-md">
+      <label for="nice_moment">Was habe ich heute Schoenes erlebt?</label>
+      <textarea id="nice_moment" name="nice_moment" rows="2"><?= e($niceMoment) ?></textarea>
+    </div>
+    <div class="field mb-0">
+      <label for="learning">Mein Learning fuer heute</label>
+      <textarea id="learning" name="learning" rows="2"><?= e($learning) ?></textarea>
+    </div>
+  </div>
 
   <div class="card">
     <label for="free_text" style="font-weight:700; display:block; margin-bottom:12px;">Freitext</label>
-    <textarea id="free_text" name="free_text" rows="6" placeholder="Wie war dein Tag?"><?= e($freeText) ?></textarea>
+    <textarea id="free_text" name="free_text" rows="5" placeholder="Was dich sonst noch beschaeftigt..."><?= e($freeText) ?></textarea>
   </div>
 
-  <button type="submit" class="btn btn-primary mt-md">Eintrag speichern</button>
+  <button type="submit" class="btn btn-primary mt-md">Tagebuch speichern</button>
 </form>
 
 <?php require __DIR__ . '/partials/footer.php'; ?>
