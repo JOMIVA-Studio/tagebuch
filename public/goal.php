@@ -50,22 +50,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = trim($_POST['description'] ?? '');
         $frequencyType = $_POST['frequency_type'] ?? 'weekly';
         $frequencyTarget = max(1, (int) ($_POST['frequency_target'] ?? 1));
+        $visionItemId = (int) ($_POST['vision_item_id'] ?? 0);
         if (!in_array($frequencyType, ['daily', 'weekly', 'monthly'], true)) {
             $frequencyType = 'weekly';
+        }
+
+        if ($visionItemId > 0) {
+            $stmt = $pdo->prepare('SELECT id FROM vision_items WHERE id = :id AND user_id = :uid');
+            $stmt->execute(['id' => $visionItemId, 'uid' => $user['id']]);
+            if (!$stmt->fetch()) {
+                $visionItemId = 0;
+            }
         }
 
         if ($title === '') {
             $errors[] = 'Bitte gib einen Titel ein.';
         } else {
             $stmt = $pdo->prepare(
-                'UPDATE goals SET title = :title, description = :description, frequency_type = :freq, frequency_target = :target WHERE id = :id'
+                'UPDATE goals SET title = :title, description = :description, vision_item_id = :vision_item_id, frequency_type = :freq, frequency_target = :target WHERE id = :id'
             );
             $stmt->execute([
-                'title'       => $title,
-                'description' => $description !== '' ? $description : null,
-                'freq'        => $frequencyType,
-                'target'      => $frequencyTarget,
-                'id'          => $goal['id'],
+                'title'          => $title,
+                'description'    => $description !== '' ? $description : null,
+                'vision_item_id' => $visionItemId > 0 ? $visionItemId : null,
+                'freq'           => $frequencyType,
+                'target'         => $frequencyTarget,
+                'id'             => $goal['id'],
             ]);
             flash('success', 'Ziel aktualisiert.');
             redirect('/goal.php?id=' . $goal['id']);
@@ -90,9 +100,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // neu laden nach evtl. Update
-$stmt = $pdo->prepare('SELECT * FROM goals WHERE id = :id AND user_id = :uid');
+$stmt = $pdo->prepare(
+    'SELECT g.*, vi.image_path AS vision_image_path
+     FROM goals g LEFT JOIN vision_items vi ON vi.id = g.vision_item_id
+     WHERE g.id = :id AND g.user_id = :uid'
+);
 $stmt->execute(['id' => $goalId, 'uid' => $user['id']]);
 $goal = $stmt->fetch();
+
+$stmt = $pdo->prepare('SELECT id, image_path FROM vision_items WHERE user_id = :uid ORDER BY z_index DESC');
+$stmt->execute(['uid' => $user['id']]);
+$visionItems = $stmt->fetchAll();
 
 $stmt = $pdo->prepare('SELECT * FROM goal_logs WHERE goal_id = :gid ORDER BY log_date DESC LIMIT 20');
 $stmt->execute(['gid' => $goal['id']]);
@@ -112,12 +130,19 @@ $heroTitle = $goal['title'];
 $heroSubtitle = $goal['description'] ?: '';
 require __DIR__ . '/partials/header.php';
 ?>
+<link rel="stylesheet" href="/assets/css/vision.css">
 
 <p><a href="/goals.php">&larr; Zurueck zu allen Zielen</a></p>
 
 <?php foreach ($errors as $error): ?>
   <div class="flash flash-error"><?= e($error) ?></div>
 <?php endforeach; ?>
+
+<?php if ($goal['vision_image_path']): ?>
+  <div class="card">
+    <img src="<?= e($goal['vision_image_path']) ?>" alt="" style="width:100%; max-height:320px; object-fit:cover; border-radius:8px; display:block;">
+  </div>
+<?php endif; ?>
 
 <div class="card-grid">
   <div class="card">
@@ -158,6 +183,23 @@ require __DIR__ . '/partials/header.php';
         <label for="description">Beschreibung</label>
         <textarea id="description" name="description" rows="2"><?= e($goal['description'] ?? '') ?></textarea>
       </div>
+      <?php if ($visionItems): ?>
+        <div class="field">
+          <label>Bild vom Visionboard</label>
+          <div class="vision-picker">
+            <label class="vision-picker-option">
+              <input type="radio" name="vision_item_id" value="0" <?= !$goal['vision_item_id'] ? 'checked' : '' ?>>
+              <span class="vision-picker-none">Kein Bild</span>
+            </label>
+            <?php foreach ($visionItems as $vi): ?>
+              <label class="vision-picker-option">
+                <input type="radio" name="vision_item_id" value="<?= (int) $vi['id'] ?>" <?= (int) $goal['vision_item_id'] === (int) $vi['id'] ? 'checked' : '' ?>>
+                <img src="<?= e($vi['image_path']) ?>" alt="">
+              </label>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endif; ?>
       <div class="field flex gap-md" style="flex-wrap:wrap;">
         <div style="flex:1; min-width:140px;">
           <label for="frequency_type">Haeufigkeit</label>

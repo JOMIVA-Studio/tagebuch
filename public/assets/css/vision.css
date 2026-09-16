@@ -65,3 +65,23 @@
   background: rgba(0,0,0,0.25); border-radius: 4px; padding: 1px 6px;
 }
 .vision-style-swatch.selected { border-color: var(--color-magenta); }
+
+/* Bildauswahl vom Visionboard (z.B. beim Anlegen eines Ziels) */
+.vision-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.vision-picker-option {
+  display: block; width: 60px; height: 60px; border-radius: 8px; overflow: hidden;
+  border: 2px solid var(--color-border); cursor: pointer; flex-shrink: 0;
+}
+.vision-picker-option input { position: absolute; opacity: 0; pointer-events: none; }
+.vision-picker-option img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vision-picker-option:has(input:checked) { border-color: var(--color-magenta); }
+.vision-picker-none {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: var(--color-muted); text-align: center; padding: 4px; background: #f2edf6;
+}
+
+/* Zielbild auf der Zielkarte */
+.goal-card-image {
+  width: 100%; display: block; height: 140px; object-fit: cover;
+  border-radius: 8px; margin-bottom: 4px;
+}
