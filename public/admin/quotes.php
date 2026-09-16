@@ -40,7 +40,7 @@ require __DIR__ . '/partials/header.php';
 
 <h2>Spruch des Tages</h2>
 <p class="text-muted">
-  Auf der Startseite wird jeden Tag automatisch ein aktiver Spruch angezeigt
+  Im Tagebuch wird jeden Tag automatisch ein aktiver Spruch angezeigt
   (rotierend nach Kalendertag). Aktuell <?= $activeCount ?> aktive Sprueche hinterlegt.
 </p>
 

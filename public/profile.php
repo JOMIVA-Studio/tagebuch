@@ -6,10 +6,31 @@ touch_user_activity((int) $user['id']);
 
 $pdo = db();
 $errors = [];
+$stmt = $pdo->prepare('SELECT * FROM daily_routines WHERE user_id = :uid');
+$stmt->execute(['uid'=>$user['id']]);
+$routine = $stmt->fetch() ?: ['morning_enabled'=>0, 'morning_time'=>'08:00:00', 'evening_enabled'=>0, 'evening_time'=>'20:00:00'];
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $action = $_POST['action'] ?? '';
+
+    if ($action === 'daily_routines') {
+        $routine = [
+            'morning_enabled'=>isset($_POST['morning_enabled']) ? 1 : 0,
+            'evening_enabled'=>isset($_POST['evening_enabled']) ? 1 : 0,
+            'morning_time'=>is_string($_POST['morning_time'] ?? null) ? $_POST['morning_time'] : '',
+            'evening_time'=>is_string($_POST['evening_time'] ?? null) ? $_POST['evening_time'] : '',
+        ];
+        if (!preg_match('/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/D', $routine['morning_time']) || !preg_match('/^(?:[01][0-9]|2[0-3]):[0-5][0-9]$/D', $routine['evening_time'])) {
+            $errors[] = 'Bitte gib zwei gültige Uhrzeiten ein.';
+        } else {
+            $stmt = $pdo->prepare('INSERT INTO daily_routines (user_id, morning_enabled, morning_time, evening_enabled, evening_time) VALUES (:uid, :morning_enabled, :morning_time, :evening_enabled, :evening_time) ON DUPLICATE KEY UPDATE morning_enabled=VALUES(morning_enabled), morning_time=VALUES(morning_time), evening_enabled=VALUES(evening_enabled), evening_time=VALUES(evening_time)');
+            $stmt->execute(['uid'=>$user['id']] + $routine);
+            flash('success', 'Morgen- und Abend-Erinnerungen gespeichert.');
+            redirect('/profile.php');
+        }
+    }
 
     if ($action === 'change_password') {
         $current = (string) ($_POST['current_password'] ?? '');
@@ -77,6 +98,22 @@ require __DIR__ . '/partials/header.php';
   <div class="flash flash-error"><?= e($error) ?></div>
 <?php endforeach; ?>
 
+<div class="card mb-0" style="margin-bottom:24px;">
+  <h2>Deine Morgen- und Abendroutine</h2>
+  <p class="text-muted small">Erinnerungen im Tagebuch, jeweils ab deiner Uhrzeit für zwei Stunden. Zeitzone: Schweiz (Europe/Zurich).</p>
+  <form method="post">
+    <?= csrf_field() ?><input type="hidden" name="action" value="daily_routines">
+    <div class="card-grid">
+      <?php foreach (['morning'=>'Morgen', 'evening'=>'Abend'] as $kind=>$label): ?>
+        <div>
+          <div class="checkbox-row field"><input type="checkbox" id="<?= $kind ?>_enabled" name="<?= $kind ?>_enabled" <?= $routine[$kind . '_enabled'] ? 'checked' : '' ?>><label for="<?= $kind ?>_enabled"><?= $label ?>-Erinnerung aktivieren</label></div>
+          <div class="field"><label for="<?= $kind ?>_time">Uhrzeit am <?= $label ?></label><input type="time" id="<?= $kind ?>_time" name="<?= $kind ?>_time" value="<?= e(substr($routine[$kind . '_time'], 0, 5)) ?>" required></div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+    <button class="btn btn-primary">Erinnerungen speichern</button>
+  </form>
+</div>
 <div class="card-grid">
   <div class="card">
     <h3>Passwort aendern</h3>
