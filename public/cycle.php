@@ -10,83 +10,110 @@ if ($user['gender'] !== 'weiblich') {
 }
 
 $pdo = db();
-$errors = [];
+
+$today = new DateTimeImmutable('today');
+$year = (int) ($_GET['y'] ?? $today->format('Y'));
+$month = (int) ($_GET['m'] ?? $today->format('n'));
+
+$firstOfMonth = DateTimeImmutable::createFromFormat('Y-n-j', "$year-$month-1");
+if ($firstOfMonth === false) {
+    $firstOfMonth = $today->modify('first day of this month');
+}
+$year = (int) $firstOfMonth->format('Y');
+$month = (int) $firstOfMonth->format('n');
+$lastOfMonth = $firstOfMonth->modify('last day of this month');
+
+$daysInMonth = (int) $firstOfMonth->format('t');
+$startOffset = (int) $firstOfMonth->format('N') - 1; // Montag = 1 ... Sonntag = 7
+
+$prevMonth = $firstOfMonth->modify('-1 month');
+$nextMonth = $firstOfMonth->modify('+1 month');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
-    $action = $_POST['action'] ?? '';
 
-    if ($action === 'add') {
-        $startDate = $_POST['start_date'] ?? '';
-        $note = trim($_POST['note'] ?? '');
-        $parsed = DateTimeImmutable::createFromFormat('Y-m-d', $startDate);
+    $checkedDays = array_flip((array) ($_POST['days'] ?? []));
 
-        if ($parsed === false) {
-            $errors[] = 'Bitte gib ein gueltiges Datum ein.';
-        } else {
-            $stmt = $pdo->prepare(
-                'INSERT IGNORE INTO cycle_entries (user_id, start_date, note) VALUES (:uid, :date, :note)'
-            );
-            $stmt->execute([
-                'uid'  => $user['id'],
-                'date' => $parsed->format('Y-m-d'),
-                'note' => $note !== '' ? $note : null,
-            ]);
-            flash('success', 'Zyklusstart gespeichert.');
-            redirect('/cycle.php');
+    $pdo->beginTransaction();
+    try {
+        $insert = $pdo->prepare('INSERT IGNORE INTO cycle_days (user_id, day_date) VALUES (:uid, :date)');
+        $delete = $pdo->prepare('DELETE FROM cycle_days WHERE user_id = :uid AND day_date = :date');
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $day);
+            if (isset($checkedDays[$dateStr])) {
+                $insert->execute(['uid' => $user['id'], 'date' => $dateStr]);
+            } else {
+                $delete->execute(['uid' => $user['id'], 'date' => $dateStr]);
+            }
         }
+        $pdo->commit();
+        flash('success', 'Periodentage fuer ' . $firstOfMonth->format('F Y') . ' gespeichert.');
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        flash('error', 'Die Eintraege konnten nicht gespeichert werden.');
     }
-
-    if ($action === 'delete') {
-        $id = (int) ($_POST['id'] ?? 0);
-        $stmt = $pdo->prepare('DELETE FROM cycle_entries WHERE id = :id AND user_id = :uid');
-        $stmt->execute(['id' => $id, 'uid' => $user['id']]);
-        flash('success', 'Eintrag geloescht.');
-        redirect('/cycle.php');
-    }
+    redirect('/cycle.php?y=' . $year . '&m=' . $month);
 }
 
-$stmt = $pdo->prepare('SELECT * FROM cycle_entries WHERE user_id = :uid ORDER BY start_date ASC');
+$stmt = $pdo->prepare(
+    'SELECT day_date FROM cycle_days WHERE user_id = :uid AND day_date BETWEEN :start AND :end'
+);
+$stmt->execute([
+    'uid'   => $user['id'],
+    'start' => $firstOfMonth->format('Y-m-d'),
+    'end'   => $lastOfMonth->format('Y-m-d'),
+]);
+$markedDaysThisMonth = array_flip(array_map(
+    fn($d) => (int) substr($d, 8, 2),
+    $stmt->fetchAll(PDO::FETCH_COLUMN)
+));
+
+$stmt = $pdo->prepare('SELECT day_date FROM cycle_days WHERE user_id = :uid ORDER BY day_date ASC');
 $stmt->execute(['uid' => $user['id']]);
-$entriesAsc = $stmt->fetchAll();
-$entriesDesc = array_reverse($entriesAsc);
+$allMarkedDates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+$periodStarts = [];
+$prevDate = null;
+foreach ($allMarkedDates as $dateStr) {
+    $date = new DateTimeImmutable($dateStr);
+    if ($prevDate === null || (int) $date->diff($prevDate)->days > 1) {
+        $periodStarts[] = $date;
+    }
+    $prevDate = $date;
+}
 
 $avgCycleLength = null;
-$currentCycleDay = null;
-$predictedNext = null;
-
-if (count($entriesAsc) >= 2) {
+if (count($periodStarts) >= 2) {
     $diffs = [];
-    for ($i = 1; $i < count($entriesAsc); $i++) {
-        $prev = new DateTimeImmutable($entriesAsc[$i - 1]['start_date']);
-        $curr = new DateTimeImmutable($entriesAsc[$i]['start_date']);
-        $diffs[] = (int) $curr->diff($prev)->days;
+    for ($i = 1; $i < count($periodStarts); $i++) {
+        $diffs[] = (int) $periodStarts[$i]->diff($periodStarts[$i - 1])->days;
     }
     $avgCycleLength = (int) round(array_sum($diffs) / count($diffs));
 }
 
-if ($entriesAsc) {
-    $lastStart = new DateTimeImmutable(end($entriesAsc)['start_date']);
-    $today = new DateTimeImmutable('today');
+$currentCycleDay = null;
+$predictedNext = null;
+if ($periodStarts) {
+    $lastStart = end($periodStarts);
     $currentCycleDay = (int) $today->diff($lastStart)->days + 1;
     if ($avgCycleLength !== null) {
         $predictedNext = $lastStart->modify('+' . $avgCycleLength . ' days');
     }
 }
 
+$monthNames = [1=>'Januar','Februar','Maerz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+$weekdays = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+
 $pageTitle = 'Zyklus-Tracker';
 $heroTone = 'magenta';
 $heroBadge = 'Tracker';
 $heroTitle = 'Zyklus';
-$heroSubtitle = 'Verfolge deinen Zyklus und behalte Vorhersagen im Blick.';
+$heroSubtitle = 'Markiere im Kalender die Tage deiner Menstruation.';
 require __DIR__ . '/partials/header.php';
 ?>
 
 <p><a href="/tracker.php">&larr; Zurueck zu allen Trackern</a></p>
-
-<?php foreach ($errors as $error): ?>
-  <div class="flash flash-error"><?= e($error) ?></div>
-<?php endforeach; ?>
 
 <div class="card-grid">
   <div class="card text-center">
@@ -104,50 +131,38 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <div class="card mt-md">
-  <h3>Zyklusstart erfassen</h3>
-  <form method="post" class="flex gap-md" style="flex-wrap:wrap; align-items:flex-end;">
+  <form method="post">
     <?= csrf_field() ?>
-    <input type="hidden" name="action" value="add">
-    <div class="field mb-0" style="flex:1; min-width:160px;">
-      <label for="start_date">Datum</label>
-      <input type="date" id="start_date" name="start_date" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>">
+    <div class="calendar-nav">
+      <a class="btn btn-ghost btn-sm" href="?y=<?= $prevMonth->format('Y') ?>&m=<?= $prevMonth->format('n') ?>">&larr; Zurueck</a>
+      <h2 class="mb-0"><?= $monthNames[$month] ?> <?= $year ?></h2>
+      <a class="btn btn-ghost btn-sm" href="?y=<?= $nextMonth->format('Y') ?>&m=<?= $nextMonth->format('n') ?>">Weiter &rarr;</a>
     </div>
-    <div class="field mb-0" style="flex:2; min-width:200px;">
-      <label for="note">Notiz (optional)</label>
-      <input type="text" id="note" name="note">
+
+    <div class="calendar-grid">
+      <?php foreach ($weekdays as $wd): ?>
+        <div class="calendar-weekday"><?= $wd ?></div>
+      <?php endforeach; ?>
+
+      <?php for ($i = 0; $i < $startOffset; $i++): ?>
+        <div class="calendar-day empty"></div>
+      <?php endfor; ?>
+
+      <?php for ($day = 1; $day <= $daysInMonth; $day++):
+          $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $day);
+          $isToday = $dateStr === $today->format('Y-m-d');
+          $isMarked = isset($markedDaysThisMonth[$day]);
+      ?>
+        <label class="calendar-day cycle-day <?= $isToday ? 'today' : '' ?>">
+          <input type="checkbox" name="days[]" value="<?= $dateStr ?>" <?= $isMarked ? 'checked' : '' ?>>
+          <span><?= $day ?></span>
+          <span class="cycle-drop"><?= icon('droplet') ?></span>
+        </label>
+      <?php endfor; ?>
     </div>
-    <button type="submit" class="btn btn-primary">Speichern</button>
+
+    <button type="submit" class="btn btn-primary mt-md">Speichern</button>
   </form>
 </div>
-
-<div class="card mt-md">
-  <h3>Verlauf</h3>
-  <?php if (!$entriesDesc): ?>
-    <p class="text-muted small">Noch keine Eintraege.</p>
-  <?php else: ?>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Datum</th><th>Notiz</th><th></th></tr></thead>
-        <tbody>
-          <?php foreach ($entriesDesc as $entry): $fid = 'cd' . (int) $entry['id']; ?>
-            <tr>
-              <td><?= e((new DateTimeImmutable($entry['start_date']))->format('d.m.Y')) ?></td>
-              <td><?= e($entry['note'] ?? '') ?></td>
-              <td><button form="<?= $fid ?>" type="submit" class="btn btn-danger btn-sm">Loeschen</button></td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    </div>
-  <?php endif; ?>
-</div>
-
-<?php foreach ($entriesDesc as $entry): ?>
-  <form id="cd<?= (int) $entry['id'] ?>" method="post">
-    <?= csrf_field() ?>
-    <input type="hidden" name="action" value="delete">
-    <input type="hidden" name="id" value="<?= (int) $entry['id'] ?>">
-  </form>
-<?php endforeach; ?>
 
 <?php require __DIR__ . '/partials/footer.php'; ?>

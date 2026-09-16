@@ -22,8 +22,9 @@ $usesSidebarShell = $loggedInUser !== null;
 
 $navItems = [
     ['href' => 'dashboard.php', 'label' => 'Startseite', 'icon' => 'home'],
+    ['href' => 'routines.php',  'label' => 'Routinen',   'icon' => 'sun', 'alsoActive' => ['morning.php', 'evening.php']],
     ['href' => 'goals.php',     'label' => 'Ziele',      'icon' => 'target', 'alsoActive' => 'goal.php'],
-    ['href' => 'tracker.php',   'label' => 'Tracker',    'icon' => 'droplet', 'alsoActive' => ['water.php', 'cycle.php']],
+    ['href' => 'tracker.php',   'label' => 'Tracker',    'icon' => 'droplet', 'alsoActive' => ['water.php', 'cycle.php', 'sleep.php']],
     ['href' => 'profile.php',   'label' => 'Profil',     'icon' => 'user'],
 ];
 ?><!doctype html>
@@ -35,7 +36,7 @@ $navItems = [
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
-<body>
+<body class="<?= in_array($currentScript, ['goals.php', 'goal.php'], true) ? 'theme-goals' : (in_array($currentScript, ['tracker.php', 'water.php', 'cycle.php', 'sleep.php'], true) ? 'theme-tracker' : 'theme-main') ?>">
 <?php if ($usesSidebarShell): ?>
 <div class="app-shell">
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
@@ -44,12 +45,12 @@ $navItems = [
       <img class="brand-logo brand-logo-md" src="/assets/img/logo-white.svg" alt="<?= e($appName) ?>">
     </a>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Hauptnavigation">
       <?php foreach ($navItems as $item):
           $alsoActive = (array) ($item['alsoActive'] ?? []);
           $isActive = $currentScript === $item['href'] || in_array($currentScript, $alsoActive, true);
       ?>
-        <a href="/<?= $item['href'] ?>" class="sidebar-link <?= $isActive ? 'active' : '' ?>">
+        <a href="/<?= $item['href'] ?>" class="sidebar-link <?= $isActive ? 'active' : '' ?>" <?= $isActive ? 'aria-current="page"' : '' ?>>
           <?= icon($item['icon']) ?><span><?= e($item['label']) ?></span>
         </a>
       <?php endforeach; ?>
