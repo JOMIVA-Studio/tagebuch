@@ -35,6 +35,13 @@ if ($user['gender'] === 'weiblich') {
     $cycleMarked = (bool) $stmt->fetchColumn();
 }
 
+$stmt = $pdo->prepare('SELECT duration_minutes, quality FROM sleep_logs WHERE user_id = :uid AND sleep_date = :date');
+$stmt->execute(['uid' => $user['id'], 'date' => $dateStr]);
+$sleepLog = $stmt->fetch();
+$sleepMinutes = $sleepLog['duration_minutes'] ?? null;
+$sleepQuality = $sleepLog['quality'] ?? null;
+$qualityLabels = [1 => 'Schlecht', 2 => 'Eher schlecht', 3 => 'Mittel', 4 => 'Gut', 5 => 'Sehr gut'];
+
 $stmt = $pdo->prepare('SELECT * FROM goals WHERE user_id = :uid AND is_active = 1 ORDER BY created_at');
 $stmt->execute(['uid' => $user['id']]);
 $goals = $stmt->fetchAll();
@@ -57,7 +64,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($amount > 0 && $amount <= 5000) {
             $stmt = $pdo->prepare('INSERT INTO water_logs (user_id, amount_ml, logged_at) VALUES (:uid, :amount, :logged)');
             $stmt->execute(['uid' => $user['id'], 'amount' => $amount, 'logged' => $dateStr . ' ' . date('H:i:s')]);
-            flash('success', $amount . ' ml Wasser hinzugefuegt.');
+            flash('success', $amount . ' ml Wasser hinzugefügt.');
+        }
+        redirect('/day.php?date=' . $dateStr);
+    }
+
+    if ($action === 'track_sleep_duration') {
+        $minutes = (int) ($_POST['minutes'] ?? 0);
+        if ($minutes > 0 && $minutes <= 1440) {
+            $quality = $sleepQuality !== null ? (int) $sleepQuality : 3;
+            $stmt = $pdo->prepare(
+                'INSERT INTO sleep_logs (user_id, sleep_date, duration_minutes, quality) VALUES (:uid, :date, :minutes, :quality)
+                 ON DUPLICATE KEY UPDATE duration_minutes = VALUES(duration_minutes)'
+            );
+            $stmt->execute(['uid' => $user['id'], 'date' => $dateStr, 'minutes' => $minutes, 'quality' => $quality]);
+            flash('success', 'Schlafdauer gespeichert.');
+        }
+        redirect('/day.php?date=' . $dateStr);
+    }
+
+    if ($action === 'track_sleep_quality') {
+        $quality = (int) ($_POST['quality'] ?? 0);
+        if ($quality >= 1 && $quality <= 5) {
+            $minutes = $sleepMinutes !== null ? (int) $sleepMinutes : 480;
+            $stmt = $pdo->prepare(
+                'INSERT INTO sleep_logs (user_id, sleep_date, duration_minutes, quality) VALUES (:uid, :date, :minutes, :quality)
+                 ON DUPLICATE KEY UPDATE quality = VALUES(quality)'
+            );
+            $stmt->execute(['uid' => $user['id'], 'date' => $dateStr, 'minutes' => $minutes, 'quality' => $quality]);
+            flash('success', 'Schlafqualität gespeichert.');
         }
         redirect('/day.php?date=' . $dateStr);
     }
@@ -83,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = isset($checked[$gid]) ? 'done' : 'not_done';
             $stmt->execute(['gid' => $gid, 'date' => $dateStr, 'status' => $status]);
         }
-        flash('success', 'Ziele fuer diesen Tag gespeichert.');
+        flash('success', 'Ziele für diesen Tag gespeichert.');
         redirect('/day.php?date=' . $dateStr);
     }
 
@@ -114,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute($fields + ['uid' => $user['id'], 'date' => $dateStr]);
     }
 
-    flash('success', 'Eintrag fuer den ' . $date->format('d.m.Y') . ' gespeichert.');
+    flash('success', 'Eintrag für den ' . $date->format('d.m.Y') . ' gespeichert.');
     redirect('/day.php?date=' . $dateStr);
 }
 
@@ -126,7 +161,7 @@ $heroSubtitle = 'Dein Tag - morgens, abends und alles dazwischen.';
 require __DIR__ . '/partials/header.php';
 ?>
 
-<p><a href="/dashboard.php">&larr; Zurueck zum Kalender</a></p>
+<p><a href="/dashboard.php">&larr; Zurück zum Kalender</a></p>
 
 <div class="card card-accent-left magenta">
   <h2>Tracker</h2>
@@ -170,7 +205,24 @@ require __DIR__ . '/partials/header.php';
     </div>
   <?php endif; ?>
 
-  <p class="small mt-md mb-0"><a href="/sleep.php?date=<?= e($dateStr) ?>">Schlaf fuer diese Nacht erfassen &rarr;</a></p>
+  <div class="field mb-0 mt-md">
+    <label class="mb-0">Schlaf <?php if ($sleepMinutes !== null): ?><span class="text-muted small">(<?= intdiv((int) $sleepMinutes, 60) ?> Std. <?= (int) $sleepMinutes % 60 ?> Min.<?= $sleepQuality !== null ? ' · ' . $qualityLabels[(int) $sleepQuality] : '' ?>)</span><?php endif; ?></label>
+    <form method="post" class="flex gap-sm mt-sm" style="flex-wrap:wrap;">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="track_sleep_duration">
+      <?php foreach ([360 => '6 Std.', 420 => '7 Std.', 450 => '7.5 Std.', 480 => '8 Std.', 540 => '9 Std.'] as $minutes => $label): ?>
+        <button type="submit" name="minutes" value="<?= $minutes ?>" class="btn btn-sm <?= (int) $sleepMinutes === $minutes ? 'btn-secondary' : 'btn-ghost' ?>"><?= $label ?></button>
+      <?php endforeach; ?>
+    </form>
+    <form method="post" class="flex gap-sm mt-sm" style="flex-wrap:wrap;">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="track_sleep_quality">
+      <?php foreach ($qualityLabels as $value => $label): ?>
+        <button type="submit" name="quality" value="<?= $value ?>" class="btn btn-sm <?= (int) $sleepQuality === $value ? 'btn-secondary' : 'btn-ghost' ?>"><?= $label ?></button>
+      <?php endforeach; ?>
+    </form>
+    <p class="small mt-sm mb-0"><a href="/sleep.php?date=<?= e($dateStr) ?>">Verlauf ansehen &rarr;</a></p>
+  </div>
 </div>
 
 <form method="post">
@@ -180,7 +232,7 @@ require __DIR__ . '/partials/header.php';
   <div class="card card-accent-top">
     <h2 class="mb-0">Morgens</h2>
     <div class="field mt-md">
-      <label for="gratitude">Wofuer bin ich dankbar?</label>
+      <label for="gratitude">Wofür bin ich dankbar?</label>
       <textarea id="gratitude" name="gratitude" rows="2"><?= e($gratitude) ?></textarea>
     </div>
     <div class="field">
@@ -196,18 +248,18 @@ require __DIR__ . '/partials/header.php';
   <div class="card card-accent-top purple">
     <h2 class="mb-0">Abends</h2>
     <div class="field mt-md">
-      <label for="nice_moment">Was habe ich heute Schoenes erlebt?</label>
+      <label for="nice_moment">Was habe ich heute Schönes erlebt?</label>
       <textarea id="nice_moment" name="nice_moment" rows="2"><?= e($niceMoment) ?></textarea>
     </div>
     <div class="field mb-0">
-      <label for="learning">Mein Learning fuer heute</label>
+      <label for="learning">Mein Learning für heute</label>
       <textarea id="learning" name="learning" rows="2"><?= e($learning) ?></textarea>
     </div>
   </div>
 
   <div class="card">
     <label for="free_text" style="font-weight:700; display:block; margin-bottom:12px;">Freitext</label>
-    <textarea id="free_text" name="free_text" rows="5" placeholder="Was dich sonst noch beschaeftigt..."><?= e($freeText) ?></textarea>
+    <textarea id="free_text" name="free_text" rows="5" placeholder="Was dich sonst noch beschäftigt..."><?= e($freeText) ?></textarea>
   </div>
 
   <button type="submit" class="btn btn-primary mt-md">Tagebuch speichern</button>
