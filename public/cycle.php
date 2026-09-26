@@ -107,21 +107,41 @@ $phases = [
         'label' => 'Menstruationsphase',
         'range' => 'Tag 1–5',
         'text'  => 'Die Gebärmutterschleimhaut wird abgestoßen. Energie und Hormonspiegel sind meist niedrig - ein guter Zeitpunkt für Ruhe, Rückzug und Selbstfürsorge.',
+        'tips'  => [
+            'Sport'      => 'Sanfte Bewegung wie Yoga, Spaziergänge oder leichtes Dehnen. Intensives Training eher pausieren.',
+            'Ernährung'  => 'Eisenreiche Lebensmittel (Hülsenfrüchte, grünes Blattgemüse), warme, nährende Mahlzeiten, ausreichend trinken.',
+            'Erholung'   => 'Extra Schlaf einplanen, Wärme (z.B. Wärmflasche) und bewusste Zeit für Rückzug gönnen.',
+        ],
     ],
     'follikel' => [
         'label' => 'Follikelphase',
         'range' => 'nach der Periode bis zum Eisprung',
         'text'  => 'Östrogen steigt an, ein neuer Follikel reift heran. Energie, Stimmung und Konzentration nehmen tendenziell zu - gut geeignet für neue Projekte und Aktivität.',
+        'tips'  => [
+            'Sport'      => 'Guter Zeitpunkt für Cardio und neue Trainingsarten - Intensität kann langsam gesteigert werden.',
+            'Ernährung'  => 'Leichte, frische Kost mit viel Gemüse, fermentierte Lebensmittel für die Darmflora.',
+            'Erholung'   => 'Die steigende Energie für neue Ideen und sozialen Austausch nutzen.',
+        ],
     ],
     'ovulation' => [
         'label' => 'Ovulationsphase',
         'range' => 'rund um den Eisprung',
         'text'  => 'Der Eisprung findet statt, die fruchtbarsten Tage im Zyklus. Energie, Selbstvertrauen und Geselligkeit sind bei vielen am höchsten.',
+        'tips'  => [
+            'Sport'      => 'Höchste Belastbarkeit - Platz für intensives Training, HIIT oder Krafttraining.',
+            'Ernährung'  => 'Leichte, ballaststoffreiche Kost mit Antioxidantien (z.B. Beeren), gut hydrieren.',
+            'Erholung'   => 'Gute Zeit für wichtige Gespräche, Präsentationen oder soziale Aktivitäten.',
+        ],
     ],
     'luteal' => [
         'label' => 'Lutealphase',
         'range' => 'nach dem Eisprung bis zur nächsten Periode',
         'text'  => 'Progesteron steigt und faellt gegen Ende wieder ab. Zum Ende hin koennen PMS-Symptome auftreten, Energie nimmt oft ab - gut fuer ruhigere, abschliessende Aufgaben.',
+        'tips'  => [
+            'Sport'      => 'Moderates Training wie Pilates oder Krafttraining mit weniger Intensität, gegen Ende sanfter werden.',
+            'Ernährung'  => 'Komplexe Kohlenhydrate und Magnesium (z.B. Nüsse, dunkle Schokolade), weniger Koffein und Zucker koennen PMS lindern.',
+            'Erholung'   => 'Laufende Aufgaben abschliessen statt Neues beginnen, mehr Schlaf und Stressreduktion einplanen.',
+        ],
     ],
 ];
 
@@ -175,6 +195,14 @@ require __DIR__ . '/partials/header.php';
     <div class="text-muted small" style="font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Aktuelle Phase</div>
     <h2 class="mt-sm mb-0"><?= e($phases[$currentPhase]['label']) ?></h2>
     <p class="mt-sm mb-0"><?= e($phases[$currentPhase]['text']) ?></p>
+    <div class="card-grid mt-md">
+      <?php foreach ($phases[$currentPhase]['tips'] as $tipLabel => $tipText): ?>
+        <div>
+          <div class="small" style="font-weight:700;"><?= e($tipLabel) ?></div>
+          <p class="small text-muted mb-0"><?= e($tipText) ?></p>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </div>
 <?php else: ?>
   <div class="flash flash-info mt-md">
@@ -192,6 +220,14 @@ require __DIR__ . '/partials/header.php';
           <span class="small text-muted"><?= e($phase['range']) ?></span>
         </div>
         <p class="small text-muted mb-0 mt-sm"><?= e($phase['text']) ?></p>
+        <div class="card-grid mt-sm">
+          <?php foreach ($phase['tips'] as $tipLabel => $tipText): ?>
+            <div>
+              <div class="small" style="font-weight:700;"><?= e($tipLabel) ?></div>
+              <p class="small text-muted mb-0"><?= e($tipText) ?></p>
+            </div>
+          <?php endforeach; ?>
+        </div>
       </div>
     <?php endforeach; ?>
   </div>
