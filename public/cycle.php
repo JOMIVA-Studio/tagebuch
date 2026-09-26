@@ -102,6 +102,14 @@ if ($periodStarts) {
     }
 }
 
+// Phasengrenzen anhand der eigenen durchschnittlichen Zykluslaenge (Annahme
+// 28 Tage, solange noch nicht genug Daten vorliegen). Die Lutealphase wird
+// in eine fruehe (stabiler) und eine spaete (PMS-nahe) Haelfte aufgeteilt.
+$cycleLengthForPhase = $avgCycleLength ?? 28;
+$ovulationStart = max(10, $cycleLengthForPhase - 14);
+$ovulationEnd = $ovulationStart + 1;
+$lateLutealStart = max($ovulationEnd + 3, $cycleLengthForPhase - 3);
+
 $phases = [
     'menstruation' => [
         'label' => 'Menstruationsphase',
@@ -115,7 +123,7 @@ $phases = [
     ],
     'follikel' => [
         'label' => 'Follikelphase',
-        'range' => 'nach der Periode bis zum Eisprung',
+        'range' => 'Tag 6–' . ($ovulationStart - 1),
         'text'  => 'Östrogen steigt an, ein neuer Follikel reift heran. Energie, Stimmung und Konzentration nehmen tendenziell zu - gut geeignet für neue Projekte und Aktivität.',
         'tips'  => [
             'Sport'      => 'Guter Zeitpunkt für Cardio und neue Trainingsarten - Intensität kann langsam gesteigert werden.',
@@ -125,7 +133,7 @@ $phases = [
     ],
     'ovulation' => [
         'label' => 'Ovulationsphase',
-        'range' => 'rund um den Eisprung',
+        'range' => 'Tag ' . $ovulationStart . '–' . $ovulationEnd,
         'text'  => 'Der Eisprung findet statt, die fruchtbarsten Tage im Zyklus. Energie, Selbstvertrauen und Geselligkeit sind bei vielen am höchsten.',
         'tips'  => [
             'Sport'      => 'Höchste Belastbarkeit - Platz für intensives Training, HIIT oder Krafttraining.',
@@ -133,32 +141,42 @@ $phases = [
             'Erholung'   => 'Gute Zeit für wichtige Gespräche, Präsentationen oder soziale Aktivitäten.',
         ],
     ],
-    'luteal' => [
-        'label' => 'Lutealphase',
-        'range' => 'nach dem Eisprung bis zur nächsten Periode',
-        'text'  => 'Progesteron steigt und fällt gegen Ende wieder ab. Zum Ende hin können PMS-Symptome auftreten, Energie nimmt oft ab - gut für ruhigere, abschliessende Aufgaben.',
+    'luteal_frueh' => [
+        'label' => 'Frühe Lutealphase',
+        'range' => 'Tag ' . ($ovulationEnd + 1) . '–' . ($lateLutealStart - 1),
+        'text'  => 'Progesteron steigt an und bereitet den Körper auf eine mögliche Schwangerschaft vor. Energie und Stimmung sind meist noch stabil, nehmen aber allmählich ab.',
         'tips'  => [
-            'Sport'      => 'Zu Beginn der Phase sind Pilates oder Krafttraining mit moderater Intensität gut machbar. Je näher die nächste Periode rückt, desto sanfter darf es werden - z.B. Spaziergänge, Yoga oder Dehnen statt intensivem Training.',
-            'Ernährung'  => 'Komplexe Kohlenhydrate und Magnesium (z.B. Nüsse, dunkle Schokolade), weniger Koffein und Zucker können PMS lindern.',
-            'Erholung'   => 'Laufende Aufgaben abschliessen statt Neues beginnen, mehr Schlaf und Stressreduktion einplanen.',
+            'Sport'      => 'Noch gut Platz für moderates Training wie Pilates, Schwimmen oder Krafttraining mit mittlerer Intensität.',
+            'Ernährung'  => 'Ausgewogene Mahlzeiten mit gesunden Fetten und Ballaststoffen, um den Blutzucker stabil zu halten.',
+            'Erholung'   => 'Guter Zeitpunkt, um laufende Projekte voranzutreiben und Aufgaben fokussiert abzuschliessen.',
+        ],
+    ],
+    'luteal_spaet' => [
+        'label' => 'Späte Lutealphase (PMS-nah)',
+        'range' => 'Tag ' . $lateLutealStart . '–' . $cycleLengthForPhase,
+        'text'  => 'Östrogen und Progesteron fallen deutlich ab. PMS-Symptome wie Reizbarkeit, Blähungen oder Müdigkeit können auftreten, Energie ist oft am niedrigsten kurz vor der Periode.',
+        'tips'  => [
+            'Sport'      => 'Sanftere Bewegung wie Spaziergänge, Yoga oder Dehnen - intensives Training eher reduzieren.',
+            'Ernährung'  => 'Magnesiumreiche Lebensmittel (Nüsse, dunkle Schokolade), weniger Salz, Koffein und Zucker können Beschwerden lindern.',
+            'Erholung'   => 'Bewusst kürzertreten, ausreichend Schlaf einplanen, Stress reduzieren und nachsichtig mit dir selbst sein.',
         ],
     ],
 ];
 
 $currentPhase = null;
 if ($currentCycleDay !== null) {
-    $cycleLengthForPhase = $avgCycleLength ?? 28;
-    $ovulationDay = max(10, $cycleLengthForPhase - 14);
     $dayInCycle = (($currentCycleDay - 1) % $cycleLengthForPhase) + 1;
 
     if ($dayInCycle <= 5) {
         $currentPhase = 'menstruation';
-    } elseif ($dayInCycle < $ovulationDay) {
+    } elseif ($dayInCycle < $ovulationStart) {
         $currentPhase = 'follikel';
-    } elseif ($dayInCycle <= $ovulationDay + 1) {
+    } elseif ($dayInCycle <= $ovulationEnd) {
         $currentPhase = 'ovulation';
+    } elseif ($dayInCycle < $lateLutealStart) {
+        $currentPhase = 'luteal_frueh';
     } else {
-        $currentPhase = 'luteal';
+        $currentPhase = 'luteal_spaet';
     }
 }
 
@@ -250,7 +268,10 @@ require __DIR__ . '/partials/header.php';
 </aside>
 </div>
 <details class="card mt-md">
-  <summary style="cursor:pointer; font-weight:700;">Die vier Zyklusphasen im Überblick</summary>
+  <summary style="cursor:pointer; font-weight:700;">Die fünf Zyklusphasen im Überblick</summary>
+  <p class="small text-muted mt-md mb-0">
+    Die Tage sind auf Basis deiner <?= $avgCycleLength !== null ? 'durchschnittlichen Zykluslänge von ' . $avgCycleLength . ' Tagen' : 'angenommenen Zykluslänge von 28 Tagen (noch nicht genug Daten für einen eigenen Durchschnitt)' ?> berechnet und daher eine Annäherung, keine exakte Vorhersage.
+  </p>
   <div class="mt-md" style="display:flex; flex-direction:column; gap:16px;">
     <?php foreach ($phases as $key => $phase): ?>
       <div>
