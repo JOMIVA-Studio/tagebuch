@@ -5,7 +5,7 @@ $user = require_login();
 touch_user_activity((int) $user['id']);
 
 if ($user['gender'] !== 'weiblich') {
-    flash('error', 'Der Zyklus-Tracker ist nur verfuegbar, wenn im Profil "weiblich" als Geschlecht hinterlegt ist.');
+    flash('error', 'Der Zyklus-Tracker ist nur verfügbar, wenn im Profil "weiblich" als Geschlecht hinterlegt ist.');
     redirect('/tracker.php');
 }
 
@@ -48,10 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         $pdo->commit();
-        flash('success', 'Periodentage fuer ' . $firstOfMonth->format('F Y') . ' gespeichert.');
+        flash('success', 'Periodentage für ' . $firstOfMonth->format('F Y') . ' gespeichert.');
     } catch (Throwable $e) {
         $pdo->rollBack();
-        flash('error', 'Die Eintraege konnten nicht gespeichert werden.');
+        flash('error', 'Die Einträge konnten nicht gespeichert werden.');
     }
     redirect('/cycle.php?y=' . $year . '&m=' . $month);
 }
@@ -102,7 +102,47 @@ if ($periodStarts) {
     }
 }
 
-$monthNames = [1=>'Januar','Februar','Maerz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+$phases = [
+    'menstruation' => [
+        'label' => 'Menstruationsphase',
+        'range' => 'Tag 1–5',
+        'text'  => 'Die Gebärmutterschleimhaut wird abgestoßen. Energie und Hormonspiegel sind meist niedrig - ein guter Zeitpunkt für Ruhe, Rückzug und Selbstfürsorge.',
+    ],
+    'follikel' => [
+        'label' => 'Follikelphase',
+        'range' => 'nach der Periode bis zum Eisprung',
+        'text'  => 'Östrogen steigt an, ein neuer Follikel reift heran. Energie, Stimmung und Konzentration nehmen tendenziell zu - gut geeignet für neue Projekte und Aktivität.',
+    ],
+    'ovulation' => [
+        'label' => 'Ovulationsphase',
+        'range' => 'rund um den Eisprung',
+        'text'  => 'Der Eisprung findet statt, die fruchtbarsten Tage im Zyklus. Energie, Selbstvertrauen und Geselligkeit sind bei vielen am höchsten.',
+    ],
+    'luteal' => [
+        'label' => 'Lutealphase',
+        'range' => 'nach dem Eisprung bis zur nächsten Periode',
+        'text'  => 'Progesteron steigt und faellt gegen Ende wieder ab. Zum Ende hin koennen PMS-Symptome auftreten, Energie nimmt oft ab - gut fuer ruhigere, abschliessende Aufgaben.',
+    ],
+];
+
+$currentPhase = null;
+if ($currentCycleDay !== null) {
+    $cycleLengthForPhase = $avgCycleLength ?? 28;
+    $ovulationDay = max(10, $cycleLengthForPhase - 14);
+    $dayInCycle = (($currentCycleDay - 1) % $cycleLengthForPhase) + 1;
+
+    if ($dayInCycle <= 5) {
+        $currentPhase = 'menstruation';
+    } elseif ($dayInCycle < $ovulationDay) {
+        $currentPhase = 'follikel';
+    } elseif ($dayInCycle <= $ovulationDay + 1) {
+        $currentPhase = 'ovulation';
+    } else {
+        $currentPhase = 'luteal';
+    }
+}
+
+$monthNames = [1=>'Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 $weekdays = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 
 $pageTitle = 'Zyklus-Tracker';
@@ -113,7 +153,7 @@ $heroSubtitle = 'Markiere im Kalender die Tage deiner Menstruation.';
 require __DIR__ . '/partials/header.php';
 ?>
 
-<p><a href="/tracker.php">&larr; Zurueck zu allen Trackern</a></p>
+<p><a href="/tracker.php">&larr; Zurück zu allen Trackern</a></p>
 
 <div class="card-grid">
   <div class="card text-center">
@@ -121,20 +161,47 @@ require __DIR__ . '/partials/header.php';
     <h2 class="mt-0"><?= $currentCycleDay ?? '–' ?></h2>
   </div>
   <div class="card text-center">
-    <div class="text-muted small">Durchschnittliche Zykluslaenge</div>
+    <div class="text-muted small">Durchschnittliche Zykluslänge</div>
     <h2 class="mt-0"><?= $avgCycleLength !== null ? $avgCycleLength . ' Tage' : '–' ?></h2>
   </div>
   <div class="card text-center">
-    <div class="text-muted small">Naechster Zyklusstart (Schaetzung)</div>
+    <div class="text-muted small">Nächster Zyklusstart (Schätzung)</div>
     <h2 class="mt-0"><?= $predictedNext !== null ? e($predictedNext->format('d.m.Y')) : '–' ?></h2>
   </div>
 </div>
+
+<?php if ($currentPhase !== null): ?>
+  <div class="card mt-md card-accent-left magenta">
+    <div class="text-muted small" style="font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Aktuelle Phase</div>
+    <h2 class="mt-sm mb-0"><?= e($phases[$currentPhase]['label']) ?></h2>
+    <p class="mt-sm mb-0"><?= e($phases[$currentPhase]['text']) ?></p>
+  </div>
+<?php else: ?>
+  <div class="flash flash-info mt-md">
+    Markiere im Kalender unten mindestens einen Periodenstart, damit deine aktuelle Zyklusphase angezeigt werden kann.
+  </div>
+<?php endif; ?>
+
+<details class="card mt-md">
+  <summary style="cursor:pointer; font-weight:700;">Die vier Zyklusphasen im Überblick</summary>
+  <div class="mt-md" style="display:flex; flex-direction:column; gap:16px;">
+    <?php foreach ($phases as $key => $phase): ?>
+      <div>
+        <div class="flex-between mb-0">
+          <strong><?= e($phase['label']) ?></strong>
+          <span class="small text-muted"><?= e($phase['range']) ?></span>
+        </div>
+        <p class="small text-muted mb-0 mt-sm"><?= e($phase['text']) ?></p>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</details>
 
 <div class="card mt-md">
   <form method="post">
     <?= csrf_field() ?>
     <div class="calendar-nav">
-      <a class="btn btn-ghost btn-sm" href="?y=<?= $prevMonth->format('Y') ?>&m=<?= $prevMonth->format('n') ?>">&larr; Zurueck</a>
+      <a class="btn btn-ghost btn-sm" href="?y=<?= $prevMonth->format('Y') ?>&m=<?= $prevMonth->format('n') ?>">&larr; Zurück</a>
       <h2 class="mb-0"><?= $monthNames[$month] ?> <?= $year ?></h2>
       <a class="btn btn-ghost btn-sm" href="?y=<?= $nextMonth->format('Y') ?>&m=<?= $nextMonth->format('n') ?>">Weiter &rarr;</a>
     </div>
