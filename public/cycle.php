@@ -136,10 +136,10 @@ $phases = [
     'luteal' => [
         'label' => 'Lutealphase',
         'range' => 'nach dem Eisprung bis zur nächsten Periode',
-        'text'  => 'Progesteron steigt und faellt gegen Ende wieder ab. Zum Ende hin koennen PMS-Symptome auftreten, Energie nimmt oft ab - gut fuer ruhigere, abschliessende Aufgaben.',
+        'text'  => 'Progesteron steigt und fällt gegen Ende wieder ab. Zum Ende hin können PMS-Symptome auftreten, Energie nimmt oft ab - gut für ruhigere, abschliessende Aufgaben.',
         'tips'  => [
-            'Sport'      => 'Moderates Training wie Pilates oder Krafttraining mit weniger Intensität, gegen Ende sanfter werden.',
-            'Ernährung'  => 'Komplexe Kohlenhydrate und Magnesium (z.B. Nüsse, dunkle Schokolade), weniger Koffein und Zucker koennen PMS lindern.',
+            'Sport'      => 'Zu Beginn der Phase sind Pilates oder Krafttraining mit moderater Intensität gut machbar. Je näher die nächste Periode rückt, desto sanfter darf es werden - z.B. Spaziergänge, Yoga oder Dehnen statt intensivem Training.',
+            'Ernährung'  => 'Komplexe Kohlenhydrate und Magnesium (z.B. Nüsse, dunkle Schokolade), weniger Koffein und Zucker können PMS lindern.',
             'Erholung'   => 'Laufende Aufgaben abschliessen statt Neues beginnen, mehr Schlaf und Stressreduktion einplanen.',
         ],
     ],
@@ -168,34 +168,71 @@ $weekdays = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 $pageTitle = 'Zyklus-Tracker';
 $heroTone = 'magenta';
 $heroBadge = 'Tracker';
-$heroTitle = 'Zyklus';
-$heroSubtitle = 'Markiere im Kalender die Tage deiner Menstruation.';
+$heroTitle = 'Dein Zyklus';
+$heroSubtitle = 'Dein Rhythmus. Dein Überblick.';
 require __DIR__ . '/partials/header.php';
 ?>
 
 <p><a href="/tracker.php">&larr; Zurück zu allen Trackern</a></p>
 
-<div class="card-grid">
-  <div class="card text-center">
+<div class="cycle-refresh">
+<div class="cycle-stats">
+  <div class="cycle-stat">
     <div class="text-muted small">Aktueller Zyklustag</div>
     <h2 class="mt-0"><?= $currentCycleDay ?? '–' ?></h2>
   </div>
-  <div class="card text-center">
-    <div class="text-muted small">Durchschnittliche Zykluslänge</div>
+  <div class="cycle-stat">
+    <div class="text-muted small">Zykluslänge · Durchschnitt</div>
     <h2 class="mt-0"><?= $avgCycleLength !== null ? $avgCycleLength . ' Tage' : '–' ?></h2>
   </div>
-  <div class="card text-center">
-    <div class="text-muted small">Nächster Zyklusstart (Schätzung)</div>
+  <div class="cycle-stat">
+    <div class="text-muted small">Nächster Start · geschätzt</div>
     <h2 class="mt-0"><?= $predictedNext !== null ? e($predictedNext->format('d.m.Y')) : '–' ?></h2>
   </div>
 </div>
 
+<div class="cycle-layout">
+<section class="card cycle-calendar">
+  <form method="post">
+    <?= csrf_field() ?>
+    <div class="calendar-nav">
+      <a aria-label="Vorheriger Monat" class="btn btn-ghost btn-sm" href="?y=<?= $prevMonth->format('Y') ?>&m=<?= $prevMonth->format('n') ?>">‹</a>
+      <h2 class="mb-0"><?= $monthNames[$month] ?> <?= $year ?></h2>
+      <a aria-label="Nächster Monat" class="btn btn-ghost btn-sm" href="?y=<?= $nextMonth->format('Y') ?>&m=<?= $nextMonth->format('n') ?>">›</a>
+    </div>
+
+    <p class="cycle-instruction">Tippe auf deine Periodentage.</p>
+    <div class="calendar-grid">
+      <?php foreach ($weekdays as $wd): ?>
+        <div class="calendar-weekday"><?= $wd ?></div>
+      <?php endforeach; ?>
+
+      <?php for ($i = 0; $i < $startOffset; $i++): ?>
+        <div class="calendar-day empty"></div>
+      <?php endfor; ?>
+
+      <?php for ($day = 1; $day <= $daysInMonth; $day++):
+          $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $day);
+          $isToday = $dateStr === $today->format('Y-m-d');
+          $isMarked = isset($markedDaysThisMonth[$day]);
+      ?>
+        <label class="calendar-day cycle-day <?= $isToday ? 'today' : '' ?>">
+          <input type="checkbox" name="days[]" aria-label="Periodentag <?= $day ?>. <?= $monthNames[$month] ?> <?= $year ?>" value="<?= $dateStr ?>" <?= $isMarked ? 'checked' : '' ?>>
+          <span class="cycle-day-face"><span><?= $day ?></span><span class="cycle-drop"><?= icon('droplet') ?></span></span>
+        </label>
+      <?php endfor; ?>
+    </div>
+
+    <div class="cycle-calendar-footer"><span class="cycle-legend"><i></i> Periode <span class="cycle-today-dot"></span> Heute</span><button type="submit" class="btn btn-primary">Tage speichern</button></div>
+  </form>
+</section>
+<aside class="cycle-aside">
 <?php if ($currentPhase !== null): ?>
-  <div class="card mt-md card-accent-left magenta">
-    <div class="text-muted small" style="font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Aktuelle Phase</div>
+  <div class="card cycle-phase">
+    <div class="text-muted small" style="font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Phase · geschätzt</div>
     <h2 class="mt-sm mb-0"><?= e($phases[$currentPhase]['label']) ?></h2>
     <p class="mt-sm mb-0"><?= e($phases[$currentPhase]['text']) ?></p>
-    <div class="card-grid mt-md">
+    <div class="cycle-tips">
       <?php foreach ($phases[$currentPhase]['tips'] as $tipLabel => $tipText): ?>
         <div>
           <div class="small" style="font-weight:700;"><?= e($tipLabel) ?></div>
@@ -210,6 +247,8 @@ require __DIR__ . '/partials/header.php';
   </div>
 <?php endif; ?>
 
+</aside>
+</div>
 <details class="card mt-md">
   <summary style="cursor:pointer; font-weight:700;">Die vier Zyklusphasen im Überblick</summary>
   <div class="mt-md" style="display:flex; flex-direction:column; gap:16px;">
@@ -233,39 +272,5 @@ require __DIR__ . '/partials/header.php';
   </div>
 </details>
 
-<div class="card mt-md">
-  <form method="post">
-    <?= csrf_field() ?>
-    <div class="calendar-nav">
-      <a class="btn btn-ghost btn-sm" href="?y=<?= $prevMonth->format('Y') ?>&m=<?= $prevMonth->format('n') ?>">&larr; Zurück</a>
-      <h2 class="mb-0"><?= $monthNames[$month] ?> <?= $year ?></h2>
-      <a class="btn btn-ghost btn-sm" href="?y=<?= $nextMonth->format('Y') ?>&m=<?= $nextMonth->format('n') ?>">Weiter &rarr;</a>
-    </div>
-
-    <div class="calendar-grid">
-      <?php foreach ($weekdays as $wd): ?>
-        <div class="calendar-weekday"><?= $wd ?></div>
-      <?php endforeach; ?>
-
-      <?php for ($i = 0; $i < $startOffset; $i++): ?>
-        <div class="calendar-day empty"></div>
-      <?php endfor; ?>
-
-      <?php for ($day = 1; $day <= $daysInMonth; $day++):
-          $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $day);
-          $isToday = $dateStr === $today->format('Y-m-d');
-          $isMarked = isset($markedDaysThisMonth[$day]);
-      ?>
-        <label class="calendar-day cycle-day <?= $isToday ? 'today' : '' ?>">
-          <input type="checkbox" name="days[]" value="<?= $dateStr ?>" <?= $isMarked ? 'checked' : '' ?>>
-          <span><?= $day ?></span>
-          <span class="cycle-drop"><?= icon('droplet') ?></span>
-        </label>
-      <?php endfor; ?>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-md">Speichern</button>
-  </form>
 </div>
-
 <?php require __DIR__ . '/partials/footer.php'; ?>
