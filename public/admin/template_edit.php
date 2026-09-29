@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = $_POST['body_html'] ?? '';
 
     if ($name === '' || $subject === '' || trim($body) === '') {
-        $errors[] = 'Bitte fuelle alle Felder aus.';
+        $errors[] = 'Bitte fülle alle Felder aus.';
     } else {
         $stmt = $pdo->prepare('UPDATE email_templates SET name = :name, subject = :subject, body_html = :body WHERE id = :id');
         $stmt->execute(['name' => $name, 'subject' => $subject, 'body' => $body, 'id' => $id]);
@@ -41,9 +41,9 @@ $pageTitle = 'Vorlage bearbeiten';
 require __DIR__ . '/partials/header.php';
 ?>
 
-<p><a href="/admin/templates.php">&larr; Zurueck zu allen Vorlagen</a></p>
+<p><a href="/admin/templates.php">&larr; Zurück zu allen Vorlagen</a></p>
 <h2><?= e($template['name']) ?></h2>
-<p class="text-muted small">Schluessel: <code><?= e($template['template_key']) ?></code> · Platzhalter: <code>{{name}}</code>, <code>{{email}}</code></p>
+<p class="text-muted small">Schlüssel: <code><?= e($template['template_key']) ?></code> · Platzhalter: <code>{{name}}</code>, <code>{{email}}</code></p>
 
 <?php foreach ($errors as $error): ?>
   <div class="flash flash-error"><?= e($error) ?></div>

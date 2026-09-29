@@ -7,7 +7,7 @@ require_once __DIR__ . '/migrate.php';
  * Liefert eine verbundene PDO-Instanz. Legt die Datenbank an, falls sie noch
  * nicht existiert, und wendet danach automatisch alle offenen Migrationen an
  * (siehe src/migrate.php) - dadurch aktualisiert sich das Schema bei jedem
- * Aufruf von selbst, ohne dass manuell SQL ausgefuehrt werden muss.
+ * Aufruf von selbst, ohne dass manuell SQL ausgeführt werden muss.
  */
 function db(): PDO
 {

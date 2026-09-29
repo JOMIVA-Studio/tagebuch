@@ -15,7 +15,7 @@ require __DIR__ . '/partials/header.php';
 <div class="card">
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Name</th><th>Schluessel</th><th>Betreff</th><th>Zuletzt geaendert</th><th></th></tr></thead>
+      <thead><tr><th>Name</th><th>Schlüssel</th><th>Betreff</th><th>Zuletzt geändert</th><th></th></tr></thead>
       <tbody>
         <?php foreach ($templates as $t): ?>
           <tr>

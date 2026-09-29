@@ -13,7 +13,9 @@ $id = (int) ($_POST['id'] ?? 0);
 $x = max(0, (int) ($_POST['x'] ?? 0));
 $y = max(0, (int) ($_POST['y'] ?? 0));
 
-$stmt = db()->prepare('UPDATE vision_items SET pos_x = :x, pos_y = :y WHERE id = :id AND user_id = :uid');
+// Table name comes exclusively from this fixed allowlist.
+$table = ($_POST['kind'] ?? 'image') === 'text' ? 'vision_texts' : 'vision_items';
+$stmt = db()->prepare("UPDATE $table SET pos_x = :x, pos_y = :y WHERE id = :id AND user_id = :uid");
 $stmt->execute(['x' => $x, 'y' => $y, 'id' => $id, 'uid' => $user['id']]);
 
 header('Content-Type: application/json');

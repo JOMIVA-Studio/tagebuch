@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 /**
- * Nimmt einen $_FILES-Eintrag entgegen, prueft ihn (echtes Bild, erlaubter
- * Typ, Groessenlimit) und speichert ihn unter einem zufaelligen Dateinamen
+ * Nimmt einen $_FILES-Eintrag entgegen, prüft ihn (echtes Bild, erlaubter
+ * Typ, Grössenlimit) und speichert ihn unter einem zufälligen Dateinamen
  * im Upload-Verzeichnis des Users. Wirft RuntimeException bei Problemen.
  *
  * @return string Relativer Web-Pfad zur gespeicherten Datei (z.B. "/uploads/vision/3/ab12cd.jpg")
@@ -21,7 +21,7 @@ function store_uploaded_image(array $file, int $userId, string $subdir): string
 
     $info = @getimagesize($file['tmp_name']);
     if ($info === false) {
-        throw new RuntimeException('Die Datei ist kein gueltiges Bild.');
+        throw new RuntimeException('Die Datei ist kein gültiges Bild.');
     }
 
     $allowed = [

@@ -5,15 +5,15 @@
 return [
     'db' => [
         'host'    => '127.0.0.1',
-        'port'    => 8889, // MAMP-Standardport fuer MySQL (bei "Set Web & MySQL ports to 80 & 3306" stattdessen 3306)
+        'port'    => 8889, // MAMP-Standardport für MySQL (bei "Set Web & MySQL ports to 80 & 3306" stattdessen 3306)
         'name'    => 'tagebuch_app',
         'user'    => 'root',
         'pass'    => 'root',
         'charset' => 'utf8mb4',
     ],
 
-    // Zufaelliger, langer String pro Installation (fuer CSRF-Token-Salt etc.)
-    'app_key' => 'bitte-hier-einen-zufaelligen-string-einsetzen',
+    // Zufälliger, langer String pro Installation (für CSRF-Token-Salt etc.)
+    'app_key' => 'bitte-hier-einen-zufälligen-string-einsetzen',
 
     'app_name' => 'Mein Tagebuch',
 ];

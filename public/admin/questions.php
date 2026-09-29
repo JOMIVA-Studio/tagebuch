@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'INSERT INTO questions (question_text, answer_type, sort_order) VALUES (:t, :type, :sort)'
             );
             $stmt->execute(['t' => $text, 'type' => $type, 'sort' => $sort]);
-            flash('success', 'Frage hinzugefuegt.');
+            flash('success', 'Frage hinzugefügt.');
             redirect('/admin/questions.php');
         }
     }
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int) ($_POST['id'] ?? 0);
         $stmt = $pdo->prepare('DELETE FROM questions WHERE id = :id');
         $stmt->execute(['id' => $id]);
-        flash('success', 'Frage geloescht.');
+        flash('success', 'Frage gelöscht.');
         redirect('/admin/questions.php');
     }
 }
@@ -62,7 +62,7 @@ require __DIR__ . '/partials/header.php';
 ?>
 
 <h2>Fragen-Katalog</h2>
-<p class="text-muted">Diese Fragen gelten zentral fuer alle User bei jedem Tagebucheintrag.</p>
+<p class="text-muted">Diese Fragen gelten zentral für alle User bei jedem Tagebucheintrag.</p>
 
 <?php foreach ($errors as $error): ?>
   <div class="flash flash-error"><?= e($error) ?></div>
@@ -89,7 +89,7 @@ require __DIR__ . '/partials/header.php';
       <label>Reihenfolge</label>
       <input type="number" name="sort_order" value="0">
     </div>
-    <button type="submit" class="btn btn-primary">Hinzufuegen</button>
+    <button type="submit" class="btn btn-primary">Hinzufügen</button>
   </form>
 </div>
 
@@ -112,7 +112,7 @@ require __DIR__ . '/partials/header.php';
             <td><input form="<?= $fid ?>" type="checkbox" name="is_active" <?= $q['is_active'] ? 'checked' : '' ?>></td>
             <td class="flex gap-sm">
               <button form="<?= $fid ?>" type="submit" class="btn btn-ghost btn-sm">Speichern</button>
-              <button form="<?= $did ?>" type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Frage wirklich loeschen? Bestehende Antworten dazu gehen verloren.');">Loeschen</button>
+              <button form="<?= $did ?>" type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Frage wirklich löschen? Bestehende Antworten dazu gehen verloren.');">Löschen</button>
             </td>
           </tr>
         <?php endforeach; ?>

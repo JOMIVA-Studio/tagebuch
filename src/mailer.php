@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 /**
- * Sehr schlanker SMTP-Client ohne externe Abhaengigkeiten (kein Composer
- * noetig). Unterstuetzt SSL (Port 465), STARTTLS (Port 587) und
- * unverschluesselt, sowie AUTH LOGIN.
+ * Sehr schlanker SMTP-Client ohne externe Abhängigkeiten (kein Composer
+ * nötig). Unterstützt SSL (Port 465), STARTTLS (Port 587) und
+ * unverschlüsselt, sowie AUTH LOGIN.
  */
 class SmtpMailer
 {
@@ -33,7 +33,7 @@ class SmtpMailer
     }
 
     /**
-     * @throws RuntimeException bei jedem Fehler, Nachricht enthaelt den Grund.
+     * @throws RuntimeException bei jedem Fehler, Nachricht enthält den Grund.
      */
     public function send(string $toEmail, string $toName, string $subject, string $htmlBody): void
     {
@@ -60,7 +60,7 @@ class SmtpMailer
             if ($this->encryption === 'tls') {
                 $this->command($socket, 'STARTTLS', 220);
                 if (!stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-                    throw new RuntimeException('STARTTLS-Verschluesselung fehlgeschlagen.');
+                    throw new RuntimeException('STARTTLS-Verschlüsselung fehlgeschlagen.');
                 }
                 $this->command($socket, 'EHLO localhost', 250);
             }
@@ -129,7 +129,7 @@ class SmtpMailer
 
 /**
  * Rendert eine Mail-Vorlage aus der DB (Platzhalter wie {{name}}) und
- * versendet sie ueber die hinterlegten SMTP-Zugangsdaten. Protokolliert
+ * versendet sie über die hinterlegten SMTP-Zugangsdaten. Protokolliert
  * jeden Versand in email_log.
  */
 function send_templated_mail(string $templateKey, array $user, array $placeholders = []): void

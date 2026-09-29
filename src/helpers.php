@@ -33,7 +33,7 @@ function csrf_verify(): void
     $token = $_POST['csrf_token'] ?? '';
     if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
         http_response_code(400);
-        die('Ungueltiges oder abgelaufenes Formular (CSRF). Bitte Seite neu laden und erneut versuchen.');
+        die('Ungültiges oder abgelaufenes Formular (CSRF). Bitte Seite neu laden und erneut versuchen.');
     }
 }
 
@@ -56,8 +56,8 @@ function redirect(string $path): void
 }
 
 /**
- * Schlanke Inline-SVG-Icons fuer die Sidebar-Navigation (Strich-Stil,
- * 20x20, currentColor) - keine externe Icon-Bibliothek noetig.
+ * Schlanke Inline-SVG-Icons für die Sidebar-Navigation (Strich-Stil,
+ * 20x20, currentColor) - keine externe Icon-Bibliothek nötig.
  */
 function icon(string $name): string
 {

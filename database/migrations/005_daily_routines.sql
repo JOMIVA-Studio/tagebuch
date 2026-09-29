@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS daily_routines (
+ user_id INT UNSIGNED PRIMARY KEY,
+ morning_enabled TINYINT(1) NOT NULL DEFAULT 0,
+ morning_time TIME NOT NULL DEFAULT '08:00:00',
+ evening_enabled TINYINT(1) NOT NULL DEFAULT 0,
+ evening_time TIME NOT NULL DEFAULT '20:00:00',
+ CONSTRAINT fk_routines_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

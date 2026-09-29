@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/../src/bootstrap.php';
+require_once __DIR__ . '/../src/sleep.php';
 $user = require_login();
 touch_user_activity((int) $user['id']);
 $pdo = db();
@@ -11,7 +12,7 @@ if (!$date || $date->format('Y-m-d') !== $dateStr) {
 }
 
 $qualityLabels = [1 => 'Schlecht', 2 => 'Eher schlecht', 3 => 'Mittel', 4 => 'Gut', 5 => 'Sehr gut'];
-$durationOptions = [330 => '5.5 Std.', 360 => '6 Std.', 390 => '6.5 Std.', 420 => '7 Std.', 450 => '7.5 Std.', 480 => '8 Std.', 510 => '8.5 Std.', 540 => '9 Std.'];
+$durationOptions = ['under5' => 'Weniger als 5 Std.', 300 => '5 Std.', 330 => '5.5 Std.', 360 => '6 Std.', 390 => '6.5 Std.', 420 => '7 Std.', 450 => '7.5 Std.', 480 => '8 Std.', 510 => '8.5 Std.', 540 => '9 Std.'];
 
 $stmt = $pdo->prepare('SELECT * FROM sleep_logs WHERE user_id = :uid AND sleep_date = :date');
 $stmt->execute(['uid' => $user['id'], 'date' => $dateStr]);
@@ -24,14 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'set_duration') {
-        $minutes = (int) ($_POST['minutes'] ?? 0);
-        if ($minutes > 0 && $minutes <= 1440) {
+        $underFive = ($_POST['minutes'] ?? '') === 'under5';
+        $minutes = $underFive ? null : (int) ($_POST['minutes'] ?? 0);
+        if ($underFive || ($minutes > 0 && $minutes <= 1440)) {
             $quality = $currentQuality !== null ? (int) $currentQuality : 3;
             $stmt = $pdo->prepare(
-                'INSERT INTO sleep_logs (user_id, sleep_date, duration_minutes, quality) VALUES (:uid, :date, :minutes, :quality)
-                 ON DUPLICATE KEY UPDATE duration_minutes = VALUES(duration_minutes)'
+                'INSERT INTO sleep_logs (user_id, sleep_date, duration_minutes, quality, under_five_hours) VALUES (:uid, :date, :minutes, :quality, :under_five)
+                 ON DUPLICATE KEY UPDATE duration_minutes = VALUES(duration_minutes), under_five_hours = VALUES(under_five_hours)'
             );
-            $stmt->execute(['uid' => $user['id'], 'date' => $dateStr, 'minutes' => $minutes, 'quality' => $quality]);
+            $stmt->execute(['uid' => $user['id'], 'date' => $dateStr, 'minutes' => $minutes, 'quality' => $quality, 'under_five' => (int) $underFive]);
             flash('success', 'Schlafdauer gespeichert.');
         }
         redirect('/sleep.php?date=' . $dateStr);
@@ -81,7 +83,7 @@ require __DIR__ . '/partials/header.php';
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="set_duration">
       <?php foreach ($durationOptions as $minutes => $label): ?>
-        <button type="submit" name="minutes" value="<?= $minutes ?>" class="btn btn-sm <?= (int) $currentMinutes === $minutes ? 'btn-secondary' : 'btn-ghost' ?>"><?= $label ?></button>
+        <button type="submit" name="minutes" value="<?= $minutes ?>" class="btn btn-sm <?= ($minutes === 'under5' ? !empty($sleep['under_five_hours']) : ($currentMinutes !== null && (int) $currentMinutes === $minutes)) ? 'btn-secondary' : 'btn-ghost' ?>"><?= $label ?></button>
       <?php endforeach; ?>
     </form>
   </div>
@@ -107,7 +109,7 @@ require __DIR__ . '/partials/header.php';
   <?php endif; ?>
   <?php foreach ($history as $night): ?>
     <a class="overview-row" href="/sleep.php?date=<?= e($night['sleep_date']) ?>">
-      <span><?= e((new DateTimeImmutable($night['sleep_date']))->format('d.m.Y')) ?> · <?= intdiv((int) $night['duration_minutes'], 60) ?> Std. <?= (int) $night['duration_minutes'] % 60 ?> Min.</span>
+      <span><?= e((new DateTimeImmutable($night['sleep_date']))->format('d.m.Y')) ?> · <?= e(sleep_duration_label($night)) ?></span>
       <span class="small text-muted"><?= e($qualityLabels[(int) $night['quality']]) ?></span>
     </a>
   <?php endforeach; ?>

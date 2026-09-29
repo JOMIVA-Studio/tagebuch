@@ -8,11 +8,10 @@ $admin = current_admin();
 $currentScript = basename($_SERVER['SCRIPT_NAME']);
 
 $navItems = [
-    ['href' => 'index.php',      'label' => 'Uebersicht',    'icon' => 'grid'],
-    ['href' => 'quotes.php',     'label' => 'Sprueche',      'icon' => 'quote'],
+    ['href' => 'index.php',      'label' => 'Übersicht',    'icon' => 'grid'],
+    ['href' => 'quotes.php',     'label' => 'Sprüche',      'icon' => 'quote'],
     ['href' => 'templates.php',  'label' => 'Mail-Vorlagen', 'icon' => 'mail', 'alsoActive' => 'template_edit.php'],
     ['href' => 'smtp.php',       'label' => 'SMTP',          'icon' => 'server'],
-    ['href' => 'ai_settings.php', 'label' => 'KI-Bilder',    'icon' => 'image'],
     ['href' => 'reminders.php',  'label' => 'Erinnerungen',  'icon' => 'bell'],
     ['href' => 'password.php',   'label' => 'Passwort',      'icon' => 'lock'],
 ];
@@ -60,7 +59,7 @@ $navItems = [
 
   <div class="app-main">
     <div class="app-topbar">
-      <button class="nav-toggle" type="button" aria-label="Menu" onclick="toggleSidebar(true)"></button>
+      <button class="nav-toggle" type="button" aria-label="Menü" onclick="toggleSidebar(true)"></button>
       <a href="/admin/index.php" class="logo">
         <img class="brand-logo brand-logo-sm" src="/assets/img/logo-black.svg" alt="<?= e($appName) ?>">
       </a>

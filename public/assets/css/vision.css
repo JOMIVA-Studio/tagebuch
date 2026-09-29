@@ -1,4 +1,5 @@
 /* ---------- Visionboard (eigenstaendiges Stylesheet, siehe vision.php) ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Poppins:wght@500;600&family=Playfair+Display:ital,wght@1,600&family=Special+Elite&family=Pacifico&family=Permanent+Marker&display=swap');
 .vision-board {
   position: relative; width: 100%; min-height: 60vh; border-radius: var(--radius-md);
   border: 1.5px solid var(--color-border); overflow: hidden; touch-action: none;
@@ -85,3 +86,236 @@
   width: 100%; display: block; height: 140px; object-fit: cover;
   border-radius: 8px; margin-bottom: 4px;
 }
+
+/* Violet creative workspace. */
+.vision-tabs { display:flex; gap:6px; padding:5px; width:fit-content; background:#eee6f7; border-radius:12px; margin-bottom:24px; }
+.vision-tabs a { padding:10px 18px; border-radius:9px; font-size:.88rem; font-weight:600; }
+.vision-tabs a[aria-current=page] { background:#6b25b6; color:#fff !important; }
+.vision-workspace { display:grid; grid-template-columns:minmax(0,1fr) 290px; gap:22px; align-items:start; }
+.vision-canvas-panel { min-width:0; background:#fff; padding:20px; border:1px solid #e3d6ef; border-radius:24px; box-shadow:0 8px 30px #6b25b608; }
+.vision-board-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.vision-board-heading h2 { color:#561e92; font-size:1.18rem; margin:0 0 5px; }
+.vision-board-heading p { font-size:.8rem; color:#81728f; margin:0; }
+.vision-count { white-space:nowrap; font-size:.7rem; background:#f3ecfb; color:#6b25b6; padding:6px 10px; border-radius:999px; }
+.vision-canvas-panel .vision-board { min-height:560px; border-color:#e0d1ed; border-radius:16px; touch-action:pan-y; }
+.vision-board-help { font-size:.73rem; color:#81728f; margin:14px 0 0; }
+.vision-tools { min-width:0; }
+.vision-tool.card { padding:20px; border-color:#e6dcef; border-radius:16px; box-shadow:none; }
+.vision-tool summary { cursor:pointer; color:#6b25b6; font-size:.88rem; font-weight:650; }
+.vision-tool[open] summary { margin-bottom:16px; }
+.vision-tool .btn { width:100%; }
+.vision-tool input[type=file] { width:100%; min-width:0; font-size:.75rem; color:#766983; }
+.vision-tool input[type=file]::file-selector-button { background:#f3ecfb; border:1px solid #dcc6f0; color:#6b25b6; border-radius:8px; padding:10px; margin-right:8px; cursor:pointer; }
+.vision-tool .flex { flex-wrap:wrap; }
+.vision-tool .vision-style-swatch { width:72px; }
+.vision-style-swatch.selected { border-color:#6b25b6; outline:2px solid #dcc6f0; outline-offset:2px; }
+.vision-item { padding:8px; background:#fff; border-radius:4px; box-shadow:0 5px 16px #38224926; }
+.vision-item img { border-radius:2px; }
+.vision-empty { flex-direction:column; gap:12px; max-width:380px; background:#ffffffdd; border-radius:20px; inset:36px; padding:24px; }
+.vision-empty h2 { color:#6b25b6; font-size:1.35rem; margin:0; }
+.vision-empty p { margin:0; }
+.vision-empty-icon { color:#6b25b6; font-size:3.5rem; line-height:1; }
+.vision-prompts { color:#887596; font-size:.78rem; line-height:1.8; }
+@media(max-width:1100px) { .vision-workspace { grid-template-columns:minmax(0,1fr); } .vision-tools { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; } .vision-tool.card { margin:0; } }
+@media(max-width:650px) { .vision-canvas-panel { padding:14px; } .vision-canvas-panel .vision-board { min-height:460px; } .vision-board-heading { align-items:flex-start; } .vision-empty { inset:16px; padding:16px; } .vision-tools { grid-row:1; } }
+
+.vision-canvas-panel .vision-board { overflow:auto; }
+
+/* Clearly distinguishable material selector and matching board surfaces. */
+.vision-materials { margin-bottom:24px; }
+.vision-materials h2 { color:#561e92; font-size:1.1rem; margin-bottom:5px; }
+.vision-materials p { color:#81728f; font-size:.8rem; margin:0; }
+.material-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:16px; }
+.material-choice { padding:5px; border:2px solid #e6dcef; border-radius:16px; background:#fff; cursor:pointer; font:inherit; text-align:left; min-width:0; }
+.material-choice:hover { border-color:#b792d9; }
+.material-choice.selected { border-color:#6b25b6; box-shadow:0 0 0 3px #6b25b612; }
+.material-preview { display:block; height:110px; border-radius:10px; position:relative; overflow:hidden; }
+.material-label { display:flex; align-items:center; justify-content:space-between; padding:12px 10px 8px; gap:8px; color:#3c284d; }
+.material-label strong { display:block; font-size:.9rem; }
+.material-label small { display:block; font-size:.72rem; color:#81728f; margin-top:3px; }
+.material-check { display:grid; place-items:center; width:24px; height:24px; border-radius:50%; color:#6b25b6; background:#f3ecfb; }
+.selected .material-check { background:#6b25b6; color:#fff; }
+.vision-bg-chalk { background-color:#303339; background-image:repeating-linear-gradient(166deg,transparent 0 37px,#ffffff08 38px,transparent 40px 83px),repeating-linear-gradient(12deg,#ffffff03 0 1px,transparent 1px 5px),linear-gradient(125deg,#45494f,#22252a); background-size:auto; border:0; box-shadow:inset 0 0 30px #00000020; }
+.vision-bg-metal { background-color:#dce0e5; background-image:repeating-linear-gradient(0deg,#ffffff22 0 1px,#8c98a011 1px 3px),linear-gradient(115deg,#c1c8ce,#f2f4f5 42%,#c4cdd4); background-size:auto; border:0; box-shadow:inset 0 0 0 5px #b8c0c6; }
+.vision-bg-cork { background-color:#c18c54; background-image:radial-gradient(ellipse at 20% 30%,#75492666 0 1px,transparent 2px),radial-gradient(ellipse at 65% 70%,#f0c98f99 0 2px,transparent 3px),radial-gradient(ellipse at 40% 80%,#8b5c3055 0 2px,transparent 3px),linear-gradient(130deg,#d9b07c,#bd884e); background-size:9px 13px,17px 11px,23px 19px,100% 100%; box-shadow:inset 0 0 0 5px #ad7844; }
+.material-paper { position:absolute; left:calc(50% - 27px); top:24px; width:54px; height:65px; background:#fffaf0; transform:rotate(-9deg); box-shadow:2px 4px 8px #0003; }
+.material-pin { position:absolute; left:calc(50% - 5px); top:21px; width:11px; height:11px; border-radius:50%; background:#a44654; box-shadow:1px 2px 3px #0005; }
+.vision-bg-metal .material-pin { width:16px; height:16px; background:radial-gradient(circle at 35% 30%,#fff,#78858e); }
+.vision-bg-chalk .material-paper { background:#f3ecfb; }
+@media(max-width:650px) { .material-grid { gap:8px; } .material-preview { height:85px; } .material-label { padding:8px 3px; } .material-label small { display:none; } .material-label strong { font-size:.78rem; } .material-check { width:18px; height:18px; font-size:.7rem; flex-shrink:0; } }
+
+/* Photographic material textures, shared by preview and canvas. */
+.vision-bg-slate { background:#33373b url('/assets/img/vision/slate.jpg') center / cover; }
+.vision-bg-chalk { background:#24382c url('/assets/img/vision/chalk-refined.jpg') center / cover; border:0; box-shadow:none; }
+.vision-bg-cork { background:#c9975a url('/assets/img/vision/cork-refined.jpg') center / cover; box-shadow:none; }
+.vision-background-tool .material-grid { grid-template-columns:1fr; gap:12px; margin-top:0; }
+.vision-background-tool .material-preview { height:100px; }
+.vision-background-tool .material-label small { display:block; }
+.vision-background-tool .material-label strong { font-size:.88rem; }
+.vision-background-tool .material-choice { width:100%; }
+
+/* Compact material tiles, with optional custom controls tucked away. */
+.vision-background-tool .material-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.vision-background-tool .material-choice { position:relative; padding:3px; border-radius:12px; }
+.vision-background-tool .material-preview { height:70px; border-radius:8px; }
+.vision-background-tool .material-label { display:block; padding:8px 0 5px; text-align:center; }
+.vision-background-tool .material-label strong { font-size:.69rem; font-weight:600; }
+.vision-background-tool .material-check { display:none; }
+.vision-background-tool .selected .material-check { display:grid; position:absolute; top:8px; right:8px; width:19px; height:19px; font-size:.7rem; box-shadow:0 1px 4px #0003; }
+.vision-custom-background { margin-top:16px; border-top:1px solid #eee6f7; padding-top:14px; }
+.vision-tool .vision-custom-background summary { font-size:.76rem; font-weight:500; color:#81728f; margin-bottom:0; }
+.vision-tool .vision-custom-background[open] summary { margin-bottom:12px; }
+body:has(.vision-workspace) .page-hero { padding-top:28px; padding-bottom:12px; margin-bottom:14px; }
+body:has(.vision-workspace) .page-hero h1 { margin-bottom:8px; }
+body:has(.vision-workspace) .page-hero .badge { margin-bottom:10px; }
+.vision-empty { max-width:280px; inset:auto 16px 24px; padding:20px; gap:8px; }
+.vision-empty h2 { font-size:1.08rem; }
+.vision-empty-icon { font-size:2rem; }
+
+/* One compact palette for textures, colors and custom backgrounds. */
+.background-options { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+.background-swatches { display:contents; }
+.background-circle,.background-color-picker,.background-upload { width:46px; height:46px; flex:0 0 46px; border-radius:50%; border:1px solid #ded4e8; padding:0; cursor:pointer; box-shadow:none; }
+.background-circle { background-size:cover; background-position:center; }
+.background-circle:hover,.background-upload:hover { outline:2px solid #c5a8df; outline-offset:3px; }
+.background-circle.selected { outline:3px solid #6b25b6; outline-offset:3px; }
+.background-color-picker { overflow:hidden; background:conic-gradient(#b524a2,#6b25b6,#26b54f,#edc774,#b524a2); padding:6px; }
+.background-color-picker::-webkit-color-swatch-wrapper { padding:0; }
+.background-color-picker::-webkit-color-swatch { border:2px solid #fff; border-radius:50%; }
+.background-color-picker::-moz-color-swatch { border:2px solid #fff; border-radius:50%; }
+.background-upload { position:relative; display:grid; place-items:center; background:#f3ecfb; color:#6b25b6; font-size:1.5rem; overflow:hidden; }
+.background-upload input[type=file] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+.background-upload:focus-within { outline:3px solid #6b25b6; outline-offset:3px; }
+
+/* Text adapts to the selected board material. */
+.font-hand   { font-family:'Caveat', 'Segoe Print', cursive; font-weight: 700; }
+.font-sans   { font-family:'Poppins', -apple-system, sans-serif; font-weight: 600; }
+.font-serif  { font-family:'Playfair Display', Georgia, serif; font-style: italic; font-weight: 600; }
+.font-mono   { font-family:'Special Elite', 'Courier New', monospace; }
+.font-script { font-family:'Pacifico', cursive; }
+.font-marker { font-family:'Permanent Marker', 'Comic Sans MS', cursive; }
+.vision-text-item { padding:30px 20px 42px; background:#fffaf0; color:#453548; overflow:visible; }
+.vision-text-content { white-space:pre-wrap; overflow-wrap:anywhere; font-size:var(--text-size); line-height:1.35; }
+.vision-text-pin { display:none; }
+.vision-bg-cork .vision-text-item { background:linear-gradient(105deg,#fffdf3,#f9edcf); border-radius:2px; box-shadow:2px 5px 12px #39241250; }
+.vision-bg-cork .vision-text-pin { display:block; position:absolute; top:7px; left:calc(50% - 7px); width:14px; height:14px; border-radius:50%; background:radial-gradient(circle at 35% 25%,#f3b2b2,#b63c49 60%,#722834); box-shadow:2px 3px 3px #0005; }
+.vision-bg-chalk .vision-text-item { background:transparent; color:#faf9ef; box-shadow:none; }
+.vision-bg-chalk .vision-text-content { text-shadow:1px 0 1px #ffffff65,-1px 1px 1px #ffffff40; }
+.vision-text-actions { display:flex; gap:6px; position:absolute; bottom:7px; right:7px; font-family:var(--font-body); }
+.vision-text-actions a,.vision-text-actions button { display:grid; place-items:center; width:28px; height:28px; border:1px solid #ddd0eb; background:#fff; border-radius:50%; color:#6b25b6; font-size:18px; cursor:pointer; text-decoration:none; }
+.vision-text-actions form { margin:0; }
+.vision-text-preview { padding:14px; background:#f3ecfb; color:#561e92; border-radius:10px; white-space:pre-wrap; overflow-wrap:anywhere; max-height:220px; overflow:auto; }
+
+/* Restore a calm, clearly arranged background palette. */
+.vision-background-tool.card { background:#fff; padding:22px; border:1px solid #e7ddef; box-shadow:0 4px 18px #38224906; }
+.vision-background-tool .background-options { display:flex; flex-wrap:wrap; gap:12px; padding:4px; }
+.vision-background-tool .background-materials { display:flex; justify-content:space-between; gap:14px; width:100%; padding:4px 0 18px; border-bottom:1px solid #eee6f5; margin-bottom:2px; }
+.vision-background-tool .background-materials .background-circle { width:60px; height:60px; flex:0 0 60px; border:3px solid white; box-shadow:0 2px 7px #30203f25; }
+.vision-background-tool .background-colors { display:flex; flex-wrap:wrap; gap:12px; width:100%; }
+.vision-background-tool .background-colors .background-circle { width:30px; height:30px; flex:0 0 30px; }
+.vision-background-tool .background-color-picker,.vision-background-tool .background-upload { width:30px; height:30px; flex-basis:30px; }
+.vision-background-tool .background-circle.selected { outline:2px solid #6b25b6; outline-offset:3px; }
+.vision-background-tool .background-circle:hover { outline:2px solid #c4a7dc; outline-offset:3px; }
+.vision-background-tool .background-circle:focus-visible { outline:3px solid #6b25b6; outline-offset:4px; }
+.vision-canvas-panel { padding:18px; border-radius:18px; box-shadow:0 5px 24px #38224908; }
+.vision-canvas-panel .vision-board { border-radius:12px; border:1px solid #ddd4e5; }
+.vision-tool.card { border-radius:14px; }
+.vision-tool summary { font-size:.85rem; }
+
+/* Explicitly reset browser controls and keep the palette consistent. */
+.vision-background-tool .background-options { gap:14px; }
+.vision-background-tool button.background-circle { appearance:none; -webkit-appearance:none; display:block; min-width:0; min-height:0; padding:0; border-radius:50%; background-position:center; background-size:cover; cursor:pointer; }
+.vision-background-tool .background-materials { justify-content:flex-start; gap:20px; padding:6px 2px 22px; }
+.vision-background-tool .background-materials button.background-circle { width:58px; height:58px; flex:0 0 58px; border:3px solid #fff; box-shadow:0 2px 8px #30203f24; }
+.vision-background-tool .background-colors { gap:12px; }
+.vision-background-tool .background-colors button.background-circle { width:28px; height:28px; flex:0 0 28px; border:1px solid #d9cfe2; }
+.background-custom-color { position:relative; display:block; width:32px; height:32px; border-radius:50%; background:conic-gradient(#b524a2,#6b25b6,#4599ce,#26b54f,#eed178,#b524a2); border:2px solid #fff; box-shadow:0 0 0 1px #e0d6e8; overflow:hidden; cursor:pointer; }
+.background-custom-color input { position:absolute; inset:0; width:100%; height:100%; padding:0; opacity:0; cursor:pointer; }
+.background-custom-color:focus-within { outline:3px solid #6b25b6; outline-offset:3px; }
+.vision-background-tool .background-upload { width:32px; height:32px; border:1px solid #e0d6e8; font-size:1.3rem; }
+
+/* Slate: paper attached with translucent masking tape. */
+.vision-bg-slate .vision-text-item {
+ background:linear-gradient(172deg,#fffef8 0%,#faf7ed 85%,#eee9dc 100%);
+ color:#39352f; border:1px solid #e5dfd2; border-radius:1px 2px 12px 2px;
+ padding:28px 22px 40px;
+ box-shadow:1px 2px 3px #0003,3px 10px 13px -6px #0008;
+}
+.vision-bg-slate .vision-text-item::before {
+ content:''; position:absolute; pointer-events:none; z-index:1;
+ width:min(78px, 45%); height:auto; aspect-ratio:78 / 25;
+ top:0; left:50%; translate:-50% -44%;
+ background:repeating-linear-gradient(90deg,#ffffff08 0 2px,#c9b98a08 2px 4px),#e7dcc1c9;
+ border-left:1px dashed #bfb18d66; border-right:1px dashed #bfb18d66;
+ box-shadow:0 1px 2px #0002; transform:rotate(-5deg);
+}
+.vision-bg-slate .vision-text-item:nth-child(even)::before { transform:rotate(4deg); }
+.vision-bg-slate .vision-text-pin { display:none; }
+.vision-bg-slate .vision-text-content { text-shadow:none; }
+.vision-bg-slate .vision-text-actions { opacity:.55; }
+.vision-bg-slate .vision-text-item:hover .vision-text-actions,
+.vision-bg-slate .vision-text-item:focus-within .vision-text-actions { opacity:1; }
+@media(hover:none) { .vision-bg-slate .vision-text-actions { opacity:1; } }
+
+/* Irregular torn paper, keeping tape and controls outside the paper mask. */
+.vision-bg-slate .vision-text-item,
+.vision-bg-cork .vision-text-item {
+ background:transparent; border:0; border-radius:0; box-shadow:none;
+ isolation:isolate;
+}
+.vision-bg-slate .vision-text-item::after,
+.vision-bg-cork .vision-text-item::after {
+ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+ background:linear-gradient(165deg,#fffdf3,#f6efde);
+ clip-path:polygon(1% 1%,12% 0%,24% 1.2%,38% .3%,51% 1%,64% 0%,79% 1.1%,91% .2%,99% 1.5%,98.8% 15%,100% 29%,99% 43%,99.7% 60%,98.8% 76%,100% 91%,98% 99%,86% 98%,73% 100%,59% 98.7%,43% 100%,29% 98.5%,15% 99.5%,1% 98%,1.5% 83%,0% 67%,1.2% 52%,.2% 37%,1.4% 22%);
+}
+.vision-bg-slate .vision-text-item,
+.vision-bg-cork .vision-text-item { filter:drop-shadow(2px 5px 3px #0004); }
+.vision-bg-slate .vision-text-item:nth-child(even)::after,
+.vision-bg-cork .vision-text-item:nth-child(even)::after {
+ clip-path:polygon(.5% 2%,16% .5%,30% 1.4%,46% 0%,62% 1%,78% .2%,98% 1%,100% 18%,98.8% 34%,100% 51%,99% 69%,99.6% 87%,98% 99%,82% 100%,67% 98.5%,51% 99.5%,35% 98.7%,18% 100%,1% 98.5%,0% 81%,1.3% 63%,.3% 46%,1% 29%);
+}
+
+/* Notes shrink to their text and wrap only once the readable width is reached.
+   Die aktuelle Groesse ist die maximale Groesse: laengerer Text laesst den
+   Kleber nicht weiter wachsen, sondern scrollt innerhalb davon. */
+.vision-board .vision-text-item {
+ width:max-content; min-width:90px; max-width:min(420px,calc(100% - 16px));
+ height:auto; min-height:0; max-height:360px; box-sizing:border-box;
+ display:flex; flex-direction:column;
+}
+.vision-text-item .vision-text-content {
+ white-space:pre-wrap; overflow-wrap:anywhere; max-width:100%;
+ overflow-y:auto; min-height:0;
+}
+
+/* Drucken / als PDF speichern: nur das Board selbst zeigen, ueber den
+   Browser-Druckdialog kann als Ziel "Als PDF sichern" gewaehlt werden. */
+.vision-board-heading { flex-wrap: wrap; }
+.vision-print-btn { margin-left: auto; }
+@media print {
+  @page { size: landscape; margin: 1cm; }
+  body * { visibility: hidden; }
+  .vision-board, .vision-board * { visibility: visible; }
+  .vision-board {
+    position: absolute; inset: 0; margin: 0 !important; width: 100% !important;
+    height: 100vh !important; min-height: 0 !important; max-width: none !important;
+    border: none !important; box-shadow: none !important;
+  }
+  .vision-delete-form, .vision-text-actions { display: none !important; }
+}
+
+.manifest-bar { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:18px; }
+#manifestStatus:empty { display:none; }
+#manifestStatus { margin:10px 0; }
+.saved-visions { margin-top:36px; }
+.saved-vision-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:18px; }
+.saved-vision-grid .card { margin:0; padding:18px; }
+.saved-vision-card img { width:100%; height:190px; object-fit:contain; background:#f7f5fa; border-radius:10px; display:block; margin-bottom:12px; }
+
+.manifest-delete { min-width:0; }
+.manifest-delete > summary { list-style:none; cursor:pointer; }
+.manifest-delete > summary::-webkit-details-marker { display:none; }
+.manifest-delete-confirm { margin-top:10px; padding:12px; background:#fff3f4; border:1px solid #efcbd1; border-radius:10px; }
+.manifest-delete-confirm p { margin:0 0 10px; }
+.manifest-delete-confirm button { color:#a52c42; border-color:#dfa5af; }

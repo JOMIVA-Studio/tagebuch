@@ -34,7 +34,7 @@ $pageTitle = 'Erinnerungen';
 require __DIR__ . '/partials/header.php';
 ?>
 
-<h2>Inaktivitaets-Erinnerungen</h2>
+<h2>Inaktivitäts-Erinnerungen</h2>
 <p class="text-muted">Nutzt die Vorlage <code>inactivity_reminder</code> (siehe <a href="/admin/templates.php">Mail-Vorlagen</a>) und die SMTP-Zugangsdaten aus <a href="/admin/smtp.php">SMTP-Einstellungen</a>.</p>
 
 <div class="card-grid">
@@ -44,7 +44,7 @@ require __DIR__ . '/partials/header.php';
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="save_threshold">
       <div class="field mb-0">
-        <label for="inactivity_threshold_days">Als inaktiv gilt, wer laenger nicht aktiv war als (Tage)</label>
+        <label for="inactivity_threshold_days">Als inaktiv gilt, wer länger nicht aktiv war als (Tage)</label>
         <input type="number" id="inactivity_threshold_days" name="inactivity_threshold_days" min="1" value="<?= $thresholdDays ?>">
       </div>
       <button type="submit" class="btn btn-secondary mt-md">Speichern</button>
@@ -53,7 +53,7 @@ require __DIR__ . '/partials/header.php';
 
   <div class="card">
     <h3>Manuell versenden</h3>
-    <p class="text-muted small">Fuer den Produktivbetrieb kannst du stattdessen <code>cron/send_inactivity_reminders.php</code> per Cronjob (z.B. taeglich) automatisch ausfuehren lassen.</p>
+    <p class="text-muted small">Für den Produktivbetrieb kannst du stattdessen <code>cron/send_inactivity_reminders.php</code> per Cronjob (z.B. täglich) automatisch ausführen lassen.</p>
     <?php if ($runResult): ?>
       <div class="flash flash-success">
         Gesendet: <?= $runResult['sent'] ?> · Fehlgeschlagen: <?= $runResult['failed'] ?>
@@ -62,7 +62,7 @@ require __DIR__ . '/partials/header.php';
     <form method="post">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="run_now">
-      <button type="submit" class="btn btn-primary">Jetzt pruefen &amp; versenden</button>
+      <button type="submit" class="btn btn-primary">Jetzt prüfen &amp; versenden</button>
     </form>
   </div>
 </div>
@@ -74,7 +74,7 @@ require __DIR__ . '/partials/header.php';
   <?php else: ?>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Datum</th><th>Empfaenger</th><th>Status</th><th>Fehler</th></tr></thead>
+        <thead><tr><th>Datum</th><th>Empfänger</th><th>Status</th><th>Fehler</th></tr></thead>
         <tbody>
           <?php foreach ($log as $entry): ?>
             <tr>

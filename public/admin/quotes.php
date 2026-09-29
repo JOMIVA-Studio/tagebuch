@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $stmt = $pdo->prepare('INSERT INTO quotes (quote_text, sort_order) VALUES (:t, :sort)');
             $stmt->execute(['t' => $text, 'sort' => $sort]);
-            flash('success', 'Spruch hinzugefuegt.');
+            flash('success', 'Spruch hinzugefügt.');
             redirect('/admin/quotes.php');
         }
     }
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int) ($_POST['id'] ?? 0);
         $stmt = $pdo->prepare('DELETE FROM quotes WHERE id = :id');
         $stmt->execute(['id' => $id]);
-        flash('success', 'Spruch geloescht.');
+        flash('success', 'Spruch gelöscht.');
         redirect('/admin/quotes.php');
     }
 }
@@ -34,14 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $quotes = $pdo->query('SELECT * FROM quotes ORDER BY sort_order, id')->fetchAll();
 $activeCount = count(array_filter($quotes, fn($q) => (int) $q['is_active'] === 1));
 
-$pageTitle = 'Sprueche verwalten';
+$pageTitle = 'Sprüche verwalten';
 require __DIR__ . '/partials/header.php';
 ?>
 
 <h2>Spruch des Tages</h2>
 <p class="text-muted">
   Im Tagebuch wird jeden Tag automatisch ein aktiver Spruch angezeigt
-  (rotierend nach Kalendertag). Aktuell <?= $activeCount ?> aktive Sprueche hinterlegt.
+  (rotierend nach Kalendertag). Aktuell <?= $activeCount ?> aktive Sprüche hinterlegt.
 </p>
 
 <?php foreach ($errors as $error): ?>
@@ -61,7 +61,7 @@ require __DIR__ . '/partials/header.php';
       <label>Reihenfolge</label>
       <input type="number" name="sort_order" value="<?= count($quotes) + 1 ?>">
     </div>
-    <button type="submit" class="btn btn-primary">Hinzufuegen</button>
+    <button type="submit" class="btn btn-primary">Hinzufügen</button>
   </form>
 </div>
 
@@ -77,11 +77,11 @@ require __DIR__ . '/partials/header.php';
             <td><?= $q['is_active'] ? 'Ja' : 'Nein' ?></td>
             <td class="flex gap-sm">
               <a class="btn btn-ghost btn-sm" href="/admin/quote_edit.php?id=<?= (int) $q['id'] ?>">Bearbeiten</a>
-              <form method="post" onsubmit="return confirm('Spruch wirklich loeschen?');">
+              <form method="post" onsubmit="return confirm('Spruch wirklich löschen?');">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="id" value="<?= (int) $q['id'] ?>">
-                <button type="submit" class="btn btn-danger btn-sm">Loeschen</button>
+                <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
               </form>
             </td>
           </tr>

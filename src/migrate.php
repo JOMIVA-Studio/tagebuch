@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 /**
- * Fuehrt alle noch nicht angewendeten Dateien aus database/migrations/ aus.
+ * Führt alle noch nicht angewendeten Dateien aus database/migrations/ aus.
  * Wird bei jedem Request aus bootstrap.php aufgerufen, damit die Datenbank
- * sich selbststaendig aktualisiert - es sind nie manuelle SQL-Schritte noetig.
+ * sich selbstständig aktualisiert - es sind nie manuelle SQL-Schritte nötig.
  */
 function run_pending_migrations(PDO $pdo): void
 {
@@ -44,7 +44,7 @@ function run_pending_migrations(PDO $pdo): void
 }
 
 /**
- * Sehr einfacher SQL-Statement-Splitter: reicht fuer unsere eigenen,
+ * Sehr einfacher SQL-Statement-Splitter: reicht für unsere eigenen,
  * kontrollierten Migrationsdateien (kein Stored-Procedure-Syntax etc.).
  */
 function split_sql_statements(string $sql): array

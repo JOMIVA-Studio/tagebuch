@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && password_verify($password, $user['password_hash'])) {
         login_user((int) $user['id']);
-        flash('success', 'Willkommen zurueck, ' . $user['name'] . '!');
+        flash('success', 'Willkommen zurück, ' . $user['name'] . '!');
         redirect('/dashboard.php');
     }
 
@@ -33,7 +33,7 @@ require __DIR__ . '/partials/header.php';
 
 <div class="stack-narrow">
   <div class="badge">Anmeldung</div>
-  <h2>Willkommen zurueck</h2>
+  <h2>Willkommen zurück</h2>
 
   <?php foreach ($errors as $error): ?>
     <div class="flash flash-error"><?= e($error) ?></div>

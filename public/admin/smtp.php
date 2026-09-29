@@ -25,11 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $encryption = 'tls';
         }
         if ($fromEmail !== '' && !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Absender-E-Mail ist ungueltig.';
+            $errors[] = 'Absender-E-Mail ist ungültig.';
         }
 
         if (!$errors) {
-            // Passwort nur ueberschreiben, wenn ein neues eingegeben wurde.
+            // Passwort nur überschreiben, wenn ein neues eingegeben wurde.
             $passwordToStore = $password !== '' ? $password : $settings['password'];
 
             $stmt = $pdo->prepare(
@@ -66,7 +66,7 @@ require __DIR__ . '/partials/header.php';
 ?>
 
 <h2>SMTP-Einstellungen</h2>
-<p class="text-muted">Zugangsdaten fuer den Versand aller System-E-Mails (Willkommens-Mail, Erinnerungen etc.).</p>
+<p class="text-muted">Zugangsdaten für den Versand aller System-E-Mails (Willkommens-Mail, Erinnerungen etc.).</p>
 
 <?php foreach ($errors as $error): ?>
   <div class="flash flash-error"><?= e($error) ?></div>
@@ -87,7 +87,7 @@ require __DIR__ . '/partials/header.php';
           <input type="number" id="port" name="port" value="<?= (int) ($settings['port'] ?? 587) ?>">
         </div>
         <div style="flex:1; min-width:150px;">
-          <label for="encryption">Verschluesselung</label>
+          <label for="encryption">Verschlüsselung</label>
           <select id="encryption" name="encryption">
             <option value="none" <?= ($settings['encryption'] ?? '') === 'none' ? 'selected' : '' ?>>Keine</option>
             <option value="ssl" <?= ($settings['encryption'] ?? '') === 'ssl' ? 'selected' : '' ?>>SSL (465)</option>
@@ -101,7 +101,7 @@ require __DIR__ . '/partials/header.php';
       </div>
       <div class="field">
         <label for="password">Passwort</label>
-        <input type="password" id="password" name="password" placeholder="unveraendert lassen = leer">
+        <input type="password" id="password" name="password" placeholder="unverändert lassen = leer">
       </div>
       <div class="field">
         <label for="from_email">Absender-E-Mail</label>

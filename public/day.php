@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/../src/bootstrap.php';
+require_once __DIR__ . '/../src/sleep.php';
 
 $user = require_login();
 touch_user_activity((int) $user['id']);
@@ -35,7 +36,7 @@ if ($user['gender'] === 'weiblich') {
     $cycleMarked = (bool) $stmt->fetchColumn();
 }
 
-$stmt = $pdo->prepare('SELECT duration_minutes, quality FROM sleep_logs WHERE user_id = :uid AND sleep_date = :date');
+$stmt = $pdo->prepare('SELECT duration_minutes, quality, under_five_hours FROM sleep_logs WHERE user_id = :uid AND sleep_date = :date');
 $stmt->execute(['uid' => $user['id'], 'date' => $dateStr]);
 $sleepLog = $stmt->fetch();
 $sleepMinutes = $sleepLog['duration_minutes'] ?? null;
@@ -70,14 +71,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'track_sleep_duration') {
-        $minutes = (int) ($_POST['minutes'] ?? 0);
-        if ($minutes > 0 && $minutes <= 1440) {
+        $underFive = ($_POST['minutes'] ?? '') === 'under5';
+        $minutes = $underFive ? null : (int) ($_POST['minutes'] ?? 0);
+        if ($underFive || ($minutes > 0 && $minutes <= 1440)) {
             $quality = $sleepQuality !== null ? (int) $sleepQuality : 3;
             $stmt = $pdo->prepare(
-                'INSERT INTO sleep_logs (user_id, sleep_date, duration_minutes, quality) VALUES (:uid, :date, :minutes, :quality)
-                 ON DUPLICATE KEY UPDATE duration_minutes = VALUES(duration_minutes)'
+                'INSERT INTO sleep_logs (user_id, sleep_date, duration_minutes, quality, under_five_hours) VALUES (:uid, :date, :minutes, :quality, :under_five)
+                 ON DUPLICATE KEY UPDATE duration_minutes = VALUES(duration_minutes), under_five_hours = VALUES(under_five_hours)'
             );
-            $stmt->execute(['uid' => $user['id'], 'date' => $dateStr, 'minutes' => $minutes, 'quality' => $quality]);
+            $stmt->execute(['uid' => $user['id'], 'date' => $dateStr, 'minutes' => $minutes, 'quality' => $quality, 'under_five' => (int) $underFive]);
             flash('success', 'Schlafdauer gespeichert.');
         }
         redirect('/day.php?date=' . $dateStr);
@@ -154,83 +156,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Tagebuch ' . $date->format('d.m.Y');
-$heroTone = 'purple';
+$heroTone = 'green';
 $heroBadge = 'Tagebuch';
-$heroTitle = $date->format('d.m.Y');
-$heroSubtitle = 'Dein Tag - morgens, abends und alles dazwischen.';
+$dayNames = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+$heroTitle = $dayNames[(int) $date->format('w')] . ', ' . $date->format('d.m.Y');
+$heroSubtitle = 'Ein kleiner Moment für dich.';
 require __DIR__ . '/partials/header.php';
 ?>
 
-<p><a href="/dashboard.php">&larr; Zurück zum Kalender</a></p>
+<p><a href="/diary.php?y=<?= $date->format('Y') ?>&amp;m=<?= $date->format('n') ?>">&larr; Zurück zum Kalender</a></p>
 
-<div class="card card-accent-left magenta">
-  <h2>Tracker</h2>
-
-  <div class="field mb-0">
-    <label class="mb-0">Wasser <span class="text-muted small">(<?= $dayWaterTotal ?> ml)</span></label>
-    <form method="post" class="flex gap-sm mt-sm" style="flex-wrap:wrap;">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="track_water">
-      <button type="submit" name="amount_ml" value="200" class="btn btn-ghost btn-sm">+200 ml</button>
-      <button type="submit" name="amount_ml" value="300" class="btn btn-ghost btn-sm">+300 ml</button>
-      <button type="submit" name="amount_ml" value="500" class="btn btn-ghost btn-sm">+500 ml</button>
-    </form>
-  </div>
-
-  <?php if ($user['gender'] === 'weiblich'): ?>
-    <form method="post" class="field mb-0 mt-md">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="toggle_cycle">
-      <label class="checkbox-row">
-        <input type="checkbox" name="cycle_marked" value="1" <?= $cycleMarked ? 'checked' : '' ?> onchange="this.form.submit()">
-        Periodentag
-      </label>
-    </form>
-  <?php endif; ?>
-
-  <?php if ($goals): ?>
-    <div class="field mb-0 mt-md">
-      <label class="mb-0">Ziele</label>
-      <form method="post" class="mt-sm">
-        <?= csrf_field() ?>
-        <input type="hidden" name="action" value="save_goals">
-        <?php foreach ($goals as $goal): $gid = (int) $goal['id']; ?>
-          <label class="checkbox-row mt-sm">
-            <input type="checkbox" name="done[]" value="<?= $gid ?>" <?= ($goalStatusToday[$gid] ?? '') === 'done' ? 'checked' : '' ?>>
-            <?= e($goal['title']) ?>
-          </label>
-        <?php endforeach; ?>
-        <button type="submit" class="btn btn-ghost btn-sm mt-md">Ziele speichern</button>
-      </form>
-    </div>
-  <?php endif; ?>
-
-  <div class="field mb-0 mt-md">
-    <label class="mb-0">Schlaf <?php if ($sleepMinutes !== null): ?><span class="text-muted small">(<?= intdiv((int) $sleepMinutes, 60) ?> Std. <?= (int) $sleepMinutes % 60 ?> Min.<?= $sleepQuality !== null ? ' · ' . $qualityLabels[(int) $sleepQuality] : '' ?>)</span><?php endif; ?></label>
-    <form method="post" class="flex gap-sm mt-sm" style="flex-wrap:wrap;">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="track_sleep_duration">
-      <?php foreach ([360 => '6 Std.', 420 => '7 Std.', 450 => '7.5 Std.', 480 => '8 Std.', 540 => '9 Std.'] as $minutes => $label): ?>
-        <button type="submit" name="minutes" value="<?= $minutes ?>" class="btn btn-sm <?= (int) $sleepMinutes === $minutes ? 'btn-secondary' : 'btn-ghost' ?>"><?= $label ?></button>
-      <?php endforeach; ?>
-    </form>
-    <form method="post" class="flex gap-sm mt-sm" style="flex-wrap:wrap;">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="track_sleep_quality">
-      <?php foreach ($qualityLabels as $value => $label): ?>
-        <button type="submit" name="quality" value="<?= $value ?>" class="btn btn-sm <?= (int) $sleepQuality === $value ? 'btn-secondary' : 'btn-ghost' ?>"><?= $label ?></button>
-      <?php endforeach; ?>
-    </form>
-    <p class="small mt-sm mb-0"><a href="/sleep.php?date=<?= e($dateStr) ?>">Verlauf ansehen &rarr;</a></p>
-  </div>
-</div>
-
-<form method="post">
+<div class="day-layout">
+<form method="post" id="dayEntryForm" class="day-entry-form">
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="save_entry">
 
-  <div class="card card-accent-top">
-    <h2 class="mb-0">Morgens</h2>
+  <div class="day-writing-grid"><section class="card day-morning">
+    <h2 class="mb-0"><span aria-hidden="true">☀️</span> Mein Morgen</h2>
     <div class="field mt-md">
       <label for="gratitude">Wofür bin ich dankbar?</label>
       <textarea id="gratitude" name="gratitude" rows="2"><?= e($gratitude) ?></textarea>
@@ -243,26 +185,121 @@ require __DIR__ . '/partials/header.php';
       <label for="affirmation">Meine Affirmation</label>
       <textarea id="affirmation" name="affirmation" rows="2"><?= e($affirmation) ?></textarea>
     </div>
-  </div>
+  </section>
 
-  <div class="card card-accent-top purple">
-    <h2 class="mb-0">Abends</h2>
+  <section class="card day-evening">
+    <h2 class="mb-0"><span aria-hidden="true">🌙</span> Mein Abend</h2>
     <div class="field mt-md">
       <label for="nice_moment">Was habe ich heute Schönes erlebt?</label>
       <textarea id="nice_moment" name="nice_moment" rows="2"><?= e($niceMoment) ?></textarea>
     </div>
     <div class="field mb-0">
-      <label for="learning">Mein Learning für heute</label>
+      <label for="learning">Was nehme ich aus diesem Tag mit?</label>
       <textarea id="learning" name="learning" rows="2"><?= e($learning) ?></textarea>
     </div>
-  </div>
+  </section></div>
 
-  <div class="card">
-    <label for="free_text" style="font-weight:700; display:block; margin-bottom:12px;">Freitext</label>
+  <details class="card day-notes" <?= $freeText !== '' ? 'open' : '' ?>>
+    <summary>Weitere Gedanken</summary><label for="free_text" class="small text-muted">Was dir noch wichtig ist</label>
     <textarea id="free_text" name="free_text" rows="5" placeholder="Was dich sonst noch beschäftigt..."><?= e($freeText) ?></textarea>
-  </div>
+  </details>
 
-  <button type="submit" class="btn btn-primary mt-md">Tagebuch speichern</button>
+  <div class="day-save"><button type="submit" class="btn btn-primary">Eintrag speichern</button></div>
 </form>
 
+<aside class="day-trackers" id="dayTrackers" aria-label="Tracker für diesen Tag"><div class="card">
+  <h2>Meine Tracker</h2><p class="small text-muted">Für diesen Tag · automatisch gespeichert</p><div role="status" class="day-tracker-status" aria-live="polite"></div>
+
+  <div class="day-tracker-block">
+    <div class="day-tracker-heading"><strong>Wasser</strong><span><?= $dayWaterTotal ?> ml</span></div>
+    <form method="post" class="day-water-actions">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="track_water">
+      <button type="submit" name="amount_ml" value="200" class="btn btn-ghost btn-sm">+200 ml</button>
+      <button type="submit" name="amount_ml" value="300" class="btn btn-ghost btn-sm">+300 ml</button>
+      <button type="submit" name="amount_ml" value="500" class="btn btn-ghost btn-sm">+500 ml</button>
+    </form>
+  </div>
+
+  <?php if ($user['gender'] === 'weiblich'): ?>
+    <form method="post" class="day-tracker-block"><div class="day-tracker-heading"><strong>Zyklus</strong></div>
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="toggle_cycle">
+      <label class="checkbox-row">
+        <input type="checkbox" name="cycle_marked" value="1" <?= $cycleMarked ? 'checked' : '' ?> onchange="this.form.requestSubmit()">
+        <span class="day-cycle-drop" aria-hidden="true"><?= icon('droplet') ?></span> Periodentag
+      </label>
+    </form>
+  <?php endif; ?>
+
+<section class="day-tracker-block"><div class="day-tracker-heading"><strong>Schlaf</strong></div>
+    <form method="post" class="day-sleep-field">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="track_sleep_duration"><label for="daySleepDuration">Dauer</label><select id="daySleepDuration" name="minutes" onchange="this.form.requestSubmit()"><option value="" disabled <?= !$sleepLog ? 'selected' : '' ?>>Auswählen</option>
+      <?php foreach (['under5' => 'Weniger als 5 Std.', 300 => '5 Std.', 330 => '5.5 Std.', 360 => '6 Std.', 390 => '6.5 Std.', 420 => '7 Std.', 450 => '7.5 Std.', 480 => '8 Std.', 510 => '8.5 Std.', 540 => '9 Std.'] as $minutes => $label): ?>
+        <option value="<?= $minutes ?>" <?= ($minutes === 'under5' ? !empty($sleepLog['under_five_hours']) : ($sleepMinutes !== null && (int) $sleepMinutes === $minutes)) ? 'selected' : '' ?>><?= $label ?></option>
+      <?php endforeach; ?></select>
+    </form>
+    <form method="post" class="day-sleep-field">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="track_sleep_quality"><label for="daySleepQuality">Erholung</label><select id="daySleepQuality" name="quality" onchange="this.form.requestSubmit()"><option value="" disabled <?= $sleepQuality === null ? 'selected' : '' ?>>Auswählen</option>
+      <?php foreach ($qualityLabels as $value => $label): ?>
+        <option value="<?= $value ?>" <?= (int) $sleepQuality === $value ? 'selected' : '' ?>><?= $label ?></option>
+      <?php endforeach; ?></select>
+    </form>
+    <p class="small mt-sm mb-0"><a href="/sleep.php?date=<?= e($dateStr) ?>">Verlauf ansehen &rarr;</a></p>
+  </section>
+
+
+
+</div>
+  <?php if ($goals): ?>
+  <section class="card day-goals-card" aria-label="Meine Ziele für diesen Tag">
+    <div class="day-goals-heading"><h2>Meine Ziele</h2><span><?= count(array_filter($goals, fn($goal) => ($goalStatusToday[(int)$goal['id']] ?? '') === 'done')) ?> / <?= count($goals) ?></span></div>
+    <form method="post">
+      <?= csrf_field() ?><input type="hidden" name="action" value="save_goals">
+      <div class="day-goals-list">
+      <?php foreach ($goals as $goal): $gid = (int) $goal['id']; ?>
+        <label class="day-goal-option">
+          <input type="checkbox" name="done[]" onchange="this.form.requestSubmit()" value="<?= $gid ?>" <?= ($goalStatusToday[$gid] ?? '') === 'done' ? 'checked' : '' ?>>
+          <span><?= e($goal['title']) ?></span>
+        </label>
+      <?php endforeach; ?>
+      </div>
+
+    </form>
+  </section>
+  <?php endif; ?>
+</aside>
+
+</div>
+<script>
+// Tracker actions update their own panel, keeping unsaved diary text intact.
+document.addEventListener('submit', async function(event) {
+  const form = event.target;
+  if (!form.closest('#dayTrackers')) return;
+  event.preventDefault();
+  const panel = document.getElementById('dayTrackers');
+  if (panel.dataset.busy) return;
+  panel.dataset.busy = '1';
+  const data = new FormData(form);
+  if (event.submitter && event.submitter.name) data.set(event.submitter.name, event.submitter.value);
+  const status = panel.querySelector('.day-tracker-status');
+  const openDetails = Array.from(panel.querySelectorAll('details')).map(el => el.open);
+  status.textContent = 'Wird gespeichert …';
+  try {
+    const response = await fetch(location.href, {method:'POST', body:data});
+    if (!response.ok) throw new Error();
+    const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const updated = doc.getElementById('dayTrackers');
+    if (!updated) throw new Error();
+    updated.querySelectorAll('details').forEach((el,i) => el.open = openDetails[i]);
+    updated.querySelector('.day-tracker-status').textContent = 'Gespeichert ✓';
+    panel.replaceWith(updated);
+  } catch (error) {
+    status.textContent = 'Speichern konnte nicht bestätigt werden. Bitte prüfe den Tracker, bevor du erneut hinzufügst.';
+    delete panel.dataset.busy;
+  }
+});
+</script>
 <?php require __DIR__ . '/partials/footer.php'; ?>

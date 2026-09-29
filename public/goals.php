@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $frequencyType = 'weekly';
     }
     if ($title === '') {
-        $errors[] = 'Bitte gib einen Titel fuer das Ziel ein.';
+        $errors[] = 'Bitte gib einen Titel für das Ziel ein.';
     }
 
     if (!$errors) {
@@ -79,13 +79,13 @@ $progressStmt = $pdo->prepare(
 
 $showForm = isset($_GET['new']) || empty($goals);
 
-$freqLabels = ['daily' => 'taeglich', 'weekly' => 'woechentlich', 'monthly' => 'monatlich'];
+$freqLabels = ['daily' => 'täglich', 'weekly' => 'wöchentlich', 'monthly' => 'monatlich'];
 
 $pageTitle = 'Ziele';
 $heroTone = 'magenta';
-$heroBadge = 'Regelmaessigkeit';
+$heroBadge = 'Regelmässigkeit';
 $heroTitle = 'Deine Ziele';
-$heroSubtitle = 'Lege Ziele mit Wunsch-Haeufigkeit an und verfolge deinen Fortschritt.';
+$heroSubtitle = 'Lege Ziele mit Wunsch-Häufigkeit an und verfolge deinen Fortschritt.';
 require __DIR__ . '/partials/header.php';
 ?>
 <link rel="stylesheet" href="/assets/css/vision.css">
@@ -132,15 +132,15 @@ require __DIR__ . '/partials/header.php';
             <?php endforeach; ?>
           </div>
         <?php else: ?>
-          <p class="small text-muted mb-0">Noch keine Fotos auf deinem <a href="/vision.php">Visionboard</a>. Lade zuerst welche hoch, dann kannst du eines hier auswaehlen.</p>
+          <p class="small text-muted mb-0">Noch keine Fotos auf deinem <a href="/vision.php">Visionboard</a>. Lade zuerst welche hoch, dann kannst du eines hier auswählen.</p>
         <?php endif; ?>
       </div>
       <div class="field flex gap-md" style="flex-wrap:wrap;">
         <div style="flex:1; min-width:160px;">
-          <label for="frequency_type">Haeufigkeit</label>
+          <label for="frequency_type">Häufigkeit</label>
           <select id="frequency_type" name="frequency_type">
-            <option value="daily">Taeglich</option>
-            <option value="weekly" selected>Woechentlich</option>
+            <option value="daily">Täglich</option>
+            <option value="weekly" selected>Wöchentlich</option>
             <option value="monthly">Monatlich</option>
           </select>
         </div>

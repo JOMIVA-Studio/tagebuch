@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <img class="brand-logo brand-logo-lg" style="margin: 0 auto 14px;" src="/assets/img/logo-black.svg" alt="Logo">
       </div>
       <h2 class="text-center">Administration</h2>
-      <p class="text-muted text-center small">Separater, session-unabhaengiger Zugang.</p>
+      <p class="text-muted text-center small">Separater, session-unabhängiger Zugang.</p>
 
       <?php foreach ($errors as $error): ?>
         <div class="flash flash-error"><?= e($error) ?></div>

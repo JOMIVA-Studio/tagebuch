@@ -1,0 +1,3 @@
+ALTER TABLE sleep_logs
+  MODIFY duration_minutes SMALLINT UNSIGNED NULL,
+  ADD under_five_hours TINYINT UNSIGNED NOT NULL DEFAULT 0;

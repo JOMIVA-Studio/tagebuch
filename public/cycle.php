@@ -267,31 +267,42 @@ require __DIR__ . '/partials/header.php';
 
 </aside>
 </div>
-<details class="card mt-md">
-  <summary style="cursor:pointer; font-weight:700;">Die fünf Zyklusphasen im Überblick</summary>
-  <p class="small text-muted mt-md mb-0">
-    Die Tage sind auf Basis deiner <?= $avgCycleLength !== null ? 'durchschnittlichen Zykluslänge von ' . $avgCycleLength . ' Tagen' : 'angenommenen Zykluslänge von 28 Tagen (noch nicht genug Daten für einen eigenen Durchschnitt)' ?> berechnet und daher eine Annäherung, keine exakte Vorhersage.
-  </p>
-  <div class="mt-md" style="display:flex; flex-direction:column; gap:16px;">
-    <?php foreach ($phases as $key => $phase): ?>
-      <div>
-        <div class="flex-between mb-0">
-          <strong><?= e($phase['label']) ?></strong>
-          <span class="small text-muted"><?= e($phase['range']) ?></span>
-        </div>
-        <p class="small text-muted mb-0 mt-sm"><?= e($phase['text']) ?></p>
-        <div class="card-grid mt-sm">
+<?php
+$phaseGroups = [
+ ['title'=>'Menstruation', 'icon'=>'◒', 'keys'=>['menstruation']],
+ ['title'=>'Follikelphase', 'icon'=>'✿', 'keys'=>['follikel']],
+ ['title'=>'Eisprung', 'icon'=>'☀', 'keys'=>['ovulation']],
+ ['title'=>'Lutealphase', 'icon'=>'☾', 'keys'=>['luteal_frueh','luteal_spaet']],
+];
+?>
+<section class="phase-overview" aria-labelledby="phaseOverviewTitle">
+  <h2 id="phaseOverviewTitle">Deine vier Zyklusphasen</h2>
+  <p class="small text-muted">Ein Überblick über deinen Rhythmus. Die Zeiträume sind geschätzt und können sich verschieben.</p>
+  <div class="phase-overview-grid">
+    <?php foreach ($phaseGroups as $index => $group): $active = in_array($currentPhase, $group['keys'], true); ?>
+    <article class="phase-overview-card phase-tone-<?= $index ?> <?= $active ? 'is-current' : '' ?>">
+      <div class="phase-overview-top"><span class="phase-symbol" aria-hidden="true"><?= $group['icon'] ?></span><span class="phase-number">0<?= $index + 1 ?></span></div>
+      <h3><?= e($group['title']) ?></h3>
+      <div class="phase-range"><?= count($group['keys']) === 1 ? e($phases[$group['keys'][0]]['range']) : 'Tag ' . ($ovulationEnd + 1) . '–' . $cycleLengthForPhase ?></div>
+      <div class="phase-status-slot"><?php if ($active): ?><span class="phase-current">Deine Phase · geschätzt</span><?php endif; ?></div>
+      <details class="phase-more">
+        <summary>Wissen & Tipps</summary>
+        <?php foreach ($group['keys'] as $key): $phase = $phases[$key]; ?>
+        <div class="phase-detail-block">
+          <?php if (count($group['keys']) > 1): ?><h4><?= e($phase['label']) ?></h4><p class="phase-range"><?= e($phase['range']) ?></p><?php endif; ?>
+          <p class="phase-description"><?= e($phase['text']) ?></p>
+          <dl class="phase-tip-list">
           <?php foreach ($phase['tips'] as $tipLabel => $tipText): ?>
-            <div>
-              <div class="small" style="font-weight:700;"><?= e($tipLabel) ?></div>
-              <p class="small text-muted mb-0"><?= e($tipText) ?></p>
-            </div>
+            <div><dt><?= e($tipLabel) ?></dt><dd><?= e($tipText) ?></dd></div>
           <?php endforeach; ?>
+          </dl>
         </div>
-      </div>
+        <?php endforeach; ?>
+      </details>
+    </article>
     <?php endforeach; ?>
   </div>
-</details>
+</section>
 
 </div>
 <?php require __DIR__ . '/partials/footer.php'; ?>

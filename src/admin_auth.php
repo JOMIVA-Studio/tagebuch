@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 /**
- * Auth fuer den Admin-Bereich. Voellig separate Session (eigener Cookie-
- * Name "tagebuch_admin_sess") und eigene Tabelle "admins" - unabhaengig
+ * Auth für den Admin-Bereich. Völlig separate Session (eigener Cookie-
+ * Name "tagebuch_admin_sess") und eigene Tabelle "admins" - unabhängig
  * vom normalen User-Login in auth.php. Ein Admin ist kein User und
  * umgekehrt.
  */

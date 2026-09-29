@@ -11,7 +11,7 @@ $goalCount = (int) $pdo->query('SELECT COUNT(*) FROM goals WHERE is_active = 1')
 $stmt = $pdo->query('SELECT id, name, email, created_at, last_activity_at FROM users ORDER BY created_at DESC LIMIT 10');
 $recentUsers = $stmt->fetchAll();
 
-$pageTitle = 'Uebersicht';
+$pageTitle = 'Übersicht';
 require __DIR__ . '/partials/header.php';
 ?>
 
@@ -19,8 +19,8 @@ require __DIR__ . '/partials/header.php';
 
 <div class="card-grid">
   <div class="card"><div class="text-muted small">User</div><h2 class="mt-0"><?= $userCount ?></h2></div>
-  <div class="card"><div class="text-muted small">Aktive Sprueche</div><h2 class="mt-0"><?= $quoteCount ?></h2></div>
-  <div class="card"><div class="text-muted small">Tagebucheintraege</div><h2 class="mt-0"><?= $entryCount ?></h2></div>
+  <div class="card"><div class="text-muted small">Aktive Sprüche</div><h2 class="mt-0"><?= $quoteCount ?></h2></div>
+  <div class="card"><div class="text-muted small">Tagebucheinträge</div><h2 class="mt-0"><?= $entryCount ?></h2></div>
   <div class="card"><div class="text-muted small">Aktive Ziele</div><h2 class="mt-0"><?= $goalCount ?></h2></div>
 </div>
 

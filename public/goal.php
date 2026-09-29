@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'status' => $status,
             'note'   => $note !== '' ? $note : null,
         ]);
-        flash('success', 'Status fuer den ' . $logDate . ' gespeichert.');
+        flash('success', 'Status für den ' . $logDate . ' gespeichert.');
         redirect('/goal.php?id=' . $goal['id']);
     }
 
@@ -88,13 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $activeCount = (int) $stmt->fetchColumn();
 
         if ($activeCount <= 1) {
-            flash('error', 'Du musst mindestens ein Ziel behalten. Lege zuerst ein neues an, bevor du dieses loeschst.');
+            flash('error', 'Du musst mindestens ein Ziel behalten. Lege zuerst ein neues an, bevor du dieses löschst.');
             redirect('/goal.php?id=' . $goal['id']);
         }
 
         $stmt = $pdo->prepare('DELETE FROM goals WHERE id = :id AND user_id = :uid');
         $stmt->execute(['id' => $goal['id'], 'uid' => $user['id']]);
-        flash('success', 'Ziel geloescht.');
+        flash('success', 'Ziel gelöscht.');
         redirect('/goals.php');
     }
 }
@@ -120,7 +120,7 @@ $stmt = $pdo->prepare('SELECT COUNT(*) FROM goals WHERE user_id = :uid AND is_ac
 $stmt->execute(['uid' => $user['id']]);
 $isOnlyGoal = (int) $stmt->fetchColumn() <= 1;
 
-$freqLabels = ['daily' => 'Taeglich', 'weekly' => 'Woechentlich', 'monthly' => 'Monatlich'];
+$freqLabels = ['daily' => 'Täglich', 'weekly' => 'Wöchentlich', 'monthly' => 'Monatlich'];
 $statusLabels = ['done' => 'Erledigt', 'partial' => 'Teilweise', 'not_done' => 'Nicht erledigt'];
 
 $pageTitle = $goal['title'];
@@ -132,7 +132,7 @@ require __DIR__ . '/partials/header.php';
 ?>
 <link rel="stylesheet" href="/assets/css/vision.css">
 
-<p><a href="/goals.php">&larr; Zurueck zu allen Zielen</a></p>
+<p><a href="/goals.php">&larr; Zurück zu allen Zielen</a></p>
 
 <?php foreach ($errors as $error): ?>
   <div class="flash flash-error"><?= e($error) ?></div>
@@ -202,7 +202,7 @@ require __DIR__ . '/partials/header.php';
       <?php endif; ?>
       <div class="field flex gap-md" style="flex-wrap:wrap;">
         <div style="flex:1; min-width:140px;">
-          <label for="frequency_type">Haeufigkeit</label>
+          <label for="frequency_type">Häufigkeit</label>
           <select id="frequency_type" name="frequency_type">
             <?php foreach ($freqLabels as $val => $label): ?>
               <option value="<?= $val ?>" <?= $goal['frequency_type'] === $val ? 'selected' : '' ?>><?= $label ?></option>
@@ -214,17 +214,17 @@ require __DIR__ . '/partials/header.php';
           <input type="number" id="frequency_target" name="frequency_target" min="1" value="<?= (int) $goal['frequency_target'] ?>">
         </div>
       </div>
-      <button type="submit" class="btn btn-secondary mt-sm">Aenderungen speichern</button>
+      <button type="submit" class="btn btn-secondary mt-sm">Änderungen speichern</button>
     </form>
 
     <hr class="divider">
 
-    <form method="post" onsubmit="return confirm('Dieses Ziel wirklich loeschen?');">
+    <form method="post" onsubmit="return confirm('Dieses Ziel wirklich löschen?');">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="delete">
-      <button type="submit" class="btn btn-danger btn-sm" <?= $isOnlyGoal ? 'disabled' : '' ?>>Ziel loeschen</button>
+      <button type="submit" class="btn btn-danger btn-sm" <?= $isOnlyGoal ? 'disabled' : '' ?>>Ziel löschen</button>
       <?php if ($isOnlyGoal): ?>
-        <div class="hint">Dies ist dein einziges Ziel und kann nicht geloescht werden.</div>
+        <div class="hint">Dies ist dein einziges Ziel und kann nicht gelöscht werden.</div>
       <?php endif; ?>
     </form>
   </div>
@@ -233,7 +233,7 @@ require __DIR__ . '/partials/header.php';
 <div class="card mt-md">
   <h3>Verlauf</h3>
   <?php if (empty($logs)): ?>
-    <p class="text-muted">Noch keine Eintraege.</p>
+    <p class="text-muted">Noch keine Einträge.</p>
   <?php else: ?>
     <div class="table-wrap">
       <table>

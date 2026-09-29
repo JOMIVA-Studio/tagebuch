@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($amount > 0 && $amount <= 5000) {
             $stmt = $pdo->prepare('INSERT INTO water_logs (user_id, amount_ml) VALUES (:uid, :amount)');
             $stmt->execute(['uid' => $user['id'], 'amount' => $amount]);
-            flash('success', $amount . ' ml hinzugefuegt.');
+            flash('success', $amount . ' ml hinzugefügt.');
         } else {
             flash('error', 'Bitte gib eine Menge zwischen 1 und 5000 ml ein.');
         }
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int) ($_POST['id'] ?? 0);
         $stmt = $pdo->prepare('DELETE FROM water_logs WHERE id = :id AND user_id = :uid');
         $stmt->execute(['id' => $id, 'uid' => $user['id']]);
-        flash('success', 'Eintrag geloescht.');
+        flash('success', 'Eintrag gelöscht.');
         redirect('/water.php');
     }
 }
@@ -60,7 +60,7 @@ $heroSubtitle = 'Trage ein, wie viel du getrunken hast.';
 require __DIR__ . '/partials/header.php';
 ?>
 
-<p><a href="/tracker.php">&larr; Zurueck zu allen Trackern</a></p>
+<p><a href="/tracker.php">&larr; Zurück zu allen Trackern</a></p>
 
 <div class="card-grid">
   <div class="card text-center">
@@ -79,14 +79,14 @@ require __DIR__ . '/partials/header.php';
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="add">
       <input type="number" name="amount_ml" min="1" max="5000" placeholder="ml" style="max-width:120px;">
-      <button type="submit" class="btn btn-primary">Hinzufuegen</button>
+      <button type="submit" class="btn btn-primary">Hinzufügen</button>
     </form>
   </div>
 
   <div class="card">
     <h3>Letzte 7 Tage</h3>
     <?php if (!$weekTotals): ?>
-      <p class="text-muted small">Noch keine Eintraege.</p>
+      <p class="text-muted small">Noch keine Einträge.</p>
     <?php else: ?>
       <?php foreach ($weekTotals as $date => $total): ?>
         <div class="mt-sm">
@@ -99,9 +99,9 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <div class="card mt-md">
-  <h3>Heutige Eintraege</h3>
+  <h3>Heutige Einträge</h3>
   <?php if (!$todayLogs): ?>
-    <p class="text-muted small">Noch keine Eintraege heute.</p>
+    <p class="text-muted small">Noch keine Einträge heute.</p>
   <?php else: ?>
     <div class="table-wrap">
       <table>
@@ -111,7 +111,7 @@ require __DIR__ . '/partials/header.php';
             <tr>
               <td><?= e((new DateTimeImmutable($log['logged_at']))->format('H:i')) ?></td>
               <td><?= (int) $log['amount_ml'] ?> ml</td>
-              <td><button form="<?= $fid ?>" type="submit" class="btn btn-danger btn-sm">Loeschen</button></td>
+              <td><button form="<?= $fid ?>" type="submit" class="btn btn-danger btn-sm">Löschen</button></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

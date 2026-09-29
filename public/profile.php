@@ -42,11 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (strlen($new) < 8) {
             $errors[] = 'Das neue Passwort muss mindestens 8 Zeichen lang sein.';
         } elseif ($new !== $confirm) {
-            $errors[] = 'Die neuen Passwoerter stimmen nicht ueberein.';
+            $errors[] = 'Die neuen Passwörter stimmen nicht überein.';
         } else {
             $stmt = $pdo->prepare('UPDATE users SET password_hash = :hash WHERE id = :id');
             $stmt->execute(['hash' => password_hash($new, PASSWORD_DEFAULT), 'id' => $user['id']]);
-            flash('success', 'Passwort wurde geaendert.');
+            flash('success', 'Passwort wurde geändert.');
             redirect('/profile.php');
         }
     }
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $enabled = isset($_POST['reminder_emails_enabled']) ? 1 : 0;
         $stmt = $pdo->prepare('UPDATE users SET reminder_emails_enabled = :val WHERE id = :id');
         $stmt->execute(['val' => $enabled, 'id' => $user['id']]);
-        flash('success', 'Einstellung fuer Erinnerungs-E-Mails gespeichert.');
+        flash('success', 'Einstellung für Erinnerungs-E-Mails gespeichert.');
         redirect('/profile.php');
     }
 
@@ -73,14 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirmBox = isset($_POST['confirm_delete']);
 
         if (!password_verify($current, $user['password_hash'])) {
-            $errors[] = 'Passwort ist falsch. Konto wurde nicht geloescht.';
+            $errors[] = 'Passwort ist falsch. Konto wurde nicht gelöscht.';
         } elseif (!$confirmBox) {
-            $errors[] = 'Bitte bestaetige die Loeschung ueber die Checkbox.';
+            $errors[] = 'Bitte bestätige die Löschung über die Checkbox.';
         } else {
             $stmt = $pdo->prepare('DELETE FROM users WHERE id = :id');
             $stmt->execute(['id' => $user['id']]);
             logout_user();
-            flash('success', 'Dein Konto und alle zugehoerigen Daten wurden geloescht.');
+            flash('success', 'Dein Konto und alle zugehörigen Daten wurden gelöscht.');
             redirect('/login.php');
         }
     }
@@ -116,7 +116,7 @@ require __DIR__ . '/partials/header.php';
 </div>
 <div class="card-grid">
   <div class="card">
-    <h3>Passwort aendern</h3>
+    <h3>Passwort ändern</h3>
     <form method="post">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="change_password">
@@ -129,7 +129,7 @@ require __DIR__ . '/partials/header.php';
         <input type="password" id="new_password" name="new_password" required minlength="8">
       </div>
       <div class="field mb-0">
-        <label for="new_password_confirm">Neues Passwort bestaetigen</label>
+        <label for="new_password_confirm">Neues Passwort bestätigen</label>
         <input type="password" id="new_password_confirm" name="new_password_confirm" required minlength="8">
       </div>
       <button type="submit" class="btn btn-secondary mt-md">Passwort speichern</button>
@@ -138,7 +138,7 @@ require __DIR__ . '/partials/header.php';
 
   <div class="card">
     <h3>Geschlecht</h3>
-    <p class="text-muted small">Wird nur fuer die Freischaltung des Zyklus-Trackers verwendet.</p>
+    <p class="text-muted small">Wird nur für die Freischaltung des Zyklus-Trackers verwendet.</p>
     <form method="post">
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="update_gender">
@@ -147,7 +147,7 @@ require __DIR__ . '/partials/header.php';
         <select id="gender" name="gender">
           <option value="" <?= $user['gender'] === null ? 'selected' : '' ?>>Keine Angabe</option>
           <option value="weiblich" <?= $user['gender'] === 'weiblich' ? 'selected' : '' ?>>Weiblich</option>
-          <option value="maennlich" <?= $user['gender'] === 'maennlich' ? 'selected' : '' ?>>Maennlich</option>
+          <option value="maennlich" <?= $user['gender'] === 'maennlich' ? 'selected' : '' ?>>Männlich</option>
           <option value="divers" <?= $user['gender'] === 'divers' ? 'selected' : '' ?>>Divers</option>
         </select>
       </div>
@@ -171,20 +171,20 @@ require __DIR__ . '/partials/header.php';
 </div>
 
 <div class="card mt-md" style="border-color:var(--color-danger);">
-  <h3 style="color:var(--color-danger);">Konto loeschen</h3>
-  <p class="text-muted small">Dies loescht dein Konto sowie alle Tagebucheintraege und Ziele unwiderruflich.</p>
-  <form method="post" onsubmit="return confirm('Konto wirklich unwiderruflich loeschen?');">
+  <h3 style="color:var(--color-danger);">Konto löschen</h3>
+  <p class="text-muted small">Dies löscht dein Konto sowie alle Tagebucheinträge und Ziele unwiderruflich.</p>
+  <form method="post" onsubmit="return confirm('Konto wirklich unwiderruflich löschen?');">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="delete_account">
     <div class="field">
-      <label for="delete_password">Passwort zur Bestaetigung</label>
+      <label for="delete_password">Passwort zur Bestätigung</label>
       <input type="password" id="delete_password" name="delete_password" required>
     </div>
     <div class="checkbox-row field">
       <input type="checkbox" id="confirm_delete" name="confirm_delete" required>
-      <label for="confirm_delete" style="margin:0;">Ich moechte mein Konto unwiderruflich loeschen.</label>
+      <label for="confirm_delete" style="margin:0;">Ich möchte mein Konto unwiderruflich löschen.</label>
     </div>
-    <button type="submit" class="btn btn-danger">Konto endgueltig loeschen</button>
+    <button type="submit" class="btn btn-danger">Konto endgültig löschen</button>
   </form>
 </div>
 

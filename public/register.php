@@ -21,13 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Bitte gib deinen Namen ein.';
     }
     if (!filter_var($emailValue, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Bitte gib eine gueltige E-Mail-Adresse ein.';
+        $errors[] = 'Bitte gib eine gültige E-Mail-Adresse ein.';
     }
     if (strlen($password) < 8) {
         $errors[] = 'Das Passwort muss mindestens 8 Zeichen lang sein.';
     }
     if ($password !== $passwordConfirm) {
-        $errors[] = 'Die Passwoerter stimmen nicht ueberein.';
+        $errors[] = 'Die Passwörter stimmen nicht überein.';
     }
 
     if (!$errors) {
@@ -90,7 +90,7 @@ require __DIR__ . '/partials/header.php';
       <div class="hint">Mindestens 8 Zeichen.</div>
     </div>
     <div class="field mb-0">
-      <label for="password_confirm">Passwort bestaetigen</label>
+      <label for="password_confirm">Passwort bestätigen</label>
       <input type="password" id="password_confirm" name="password_confirm" required minlength="8">
     </div>
     <button type="submit" class="btn btn-primary btn-block mt-md">Registrieren</button>

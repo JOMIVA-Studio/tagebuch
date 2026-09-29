@@ -7,8 +7,8 @@ if (!defined('APP_BOOTSTRAPPED')) {
  * Erwartet (optional), bevor diese Datei eingebunden wird:
  *   $pageTitle    string  Browser-Tab-Titel
  *   $heroTone     string  'green' | 'purple' | 'magenta'  -> zeigt eine farbige Kopfzeile
- *   $heroBadge    string  kleines Label ueber dem Titel
- *   $heroTitle    string  grosse Ueberschrift im Hero
+ *   $heroBadge    string  kleines Label über dem Titel
+ *   $heroTitle    string  grosse Überschrift im Hero
  *   $heroSubtitle string  optionaler Untertext
  *
  * Eingeloggte User bekommen die Sidebar-Navigation (angelehnt an das
@@ -21,7 +21,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME']);
 $usesSidebarShell = $loggedInUser !== null;
 
 $navItems = [
-    ['href' => 'dashboard.php', 'label' => 'Tagebuch', 'icon' => 'home', 'alsoActive' => 'day.php'],
+    ['href' => 'diary.php', 'label' => 'Tagebuch', 'icon' => 'home', 'alsoActive' => 'day.php'],
     ['href' => 'goals.php',     'label' => 'Ziele',      'icon' => 'target', 'alsoActive' => ['goal.php', 'vision.php']],
     ['href' => 'tracker.php',   'label' => 'Tracker',    'icon' => 'droplet', 'alsoActive' => ['water.php', 'cycle.php', 'sleep.php']],
     ['href' => 'profile.php',   'label' => 'Profil',     'icon' => 'user'],
@@ -33,15 +33,16 @@ $navItems = [
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($pageTitle ?? $appName) ?> · <?= e($appName) ?></title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../assets/css/style.css'),0,12) ?>">
+  <link rel="stylesheet" href="/assets/css/consistency.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../assets/css/consistency.css'),0,12) ?>">
 </head>
-<body class="<?= in_array($currentScript, ['goals.php', 'goal.php'], true) ? 'theme-goals' : (in_array($currentScript, ['tracker.php', 'water.php', 'cycle.php', 'sleep.php'], true) ? 'theme-tracker' : 'theme-main') ?>">
+<body class="<?= in_array($currentScript, ['goals.php', 'goal.php', 'vision.php'], true) ? 'theme-goals' : (in_array($currentScript, ['tracker.php', 'water.php', 'cycle.php', 'sleep.php'], true) ? 'theme-tracker' : 'theme-main') ?><?= in_array($currentScript, ['dashboard.php', 'profile.php'], true) ? ' home-neutral' : '' ?><?= $currentScript === 'profile.php' ? ' profile-neutral' : '' ?>">
 <?php if ($usesSidebarShell): ?>
 <div class="app-shell">
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
   <aside class="sidebar" id="sidebar">
-    <a href="/dashboard.php" class="logo sidebar-logo">
-      <img class="brand-logo brand-logo-md" src="/assets/img/logo-white.svg" alt="<?= e($appName) ?>">
+    <a href="/dashboard.php" class="logo sidebar-logo" aria-label="Startseite">
+      <img class="brand-logo brand-logo-md" src="/assets/img/<?= in_array($currentScript, ['dashboard.php', 'profile.php'], true) ? 'logo-black.svg' : 'logo-white.svg' ?>" alt="<?= e($appName) ?>">
     </a>
 
     <nav class="sidebar-nav" aria-label="Hauptnavigation">
@@ -71,8 +72,8 @@ $navItems = [
 
   <div class="app-main">
     <div class="app-topbar">
-      <button class="nav-toggle" type="button" aria-label="Menu" onclick="toggleSidebar(true)"></button>
-      <a href="/dashboard.php" class="logo">
+      <button class="nav-toggle" type="button" aria-label="Menü" onclick="toggleSidebar(true)"></button>
+      <a href="/dashboard.php" class="logo" aria-label="Startseite">
         <img class="brand-logo brand-logo-sm" src="/assets/img/logo-black.svg" alt="<?= e($appName) ?>">
       </a>
     </div>

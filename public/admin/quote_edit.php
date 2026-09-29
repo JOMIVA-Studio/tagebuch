@@ -41,7 +41,7 @@ $pageTitle = 'Spruch bearbeiten';
 require __DIR__ . '/partials/header.php';
 ?>
 
-<p><a href="/admin/quotes.php">&larr; Zurueck zu allen Spruechen</a></p>
+<p><a href="/admin/quotes.php">&larr; Zurück zu allen Sprüchen</a></p>
 <h2>Spruch bearbeiten</h2>
 
 <?php foreach ($errors as $error): ?>

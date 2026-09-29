@@ -1,0 +1,164 @@
+/* Shared visual rules for all customer pages. */
+body { --radius-lg:18px; --radius-md:12px; --shadow-card:0 3px 16px #29302005; }
+body.home-neutral { --section-color:#333c31; --section-dark:#333c31; --section-soft:#f1f3ed; --section-border:#dce1d5; --section-ink:#fff; }
+body .app-shell .page-hero { padding:30px 0 18px; margin-bottom:16px; }
+body .app-shell .page-hero h1 { font-size:clamp(1.85rem,3vw,2.6rem); font-weight:600; line-height:1.2; letter-spacing:-.035em; margin-bottom:8px; overflow-wrap:anywhere; }
+body .app-shell .page-hero p { font-size:.9rem; line-height:1.6; }
+body .app-shell .page-hero .badge.on-color { font-size:.65rem; letter-spacing:.16em; margin-bottom:10px; }
+body .app-shell main .card { border-radius:18px; box-shadow:var(--shadow-card); }
+body .app-shell main > .container > .card,
+body .app-shell main .card-grid > .card { padding:24px; }
+body .app-shell main .card h2 { font-size:1.2rem; font-weight:600; letter-spacing:-.02em; line-height:1.35; }
+body .app-shell main .card h3 { font-size:1rem; font-weight:600; line-height:1.4; }
+body .app-shell .card-grid { gap:20px; }
+body .app-shell main .btn { border-radius:10px; padding:11px 16px; font-size:.84rem; font-weight:600; line-height:1.4; transition:background-color .15s,border-color .15s; }
+body .app-shell main .btn-sm { padding:8px 12px; font-size:.76rem; }
+body .app-shell main .btn-primary,
+body .app-shell main .btn-secondary { background:var(--section-color); border-color:var(--section-color); color:var(--section-ink); }
+body .app-shell main .btn-primary:hover,
+body .app-shell main .btn-secondary:hover { background:var(--section-dark); border-color:var(--section-dark); color:#fff; }
+body .app-shell main .btn-ghost { background:var(--section-soft); border:1px solid var(--section-border); color:var(--section-dark); }
+body .app-shell main .btn:focus-visible { outline:2px solid var(--section-dark); outline-offset:3px; }
+body .app-shell main :is(input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=time],textarea,select) { border:1px solid #dfe3df; background:#fff; border-radius:10px; padding:11px 12px; font:inherit; font-size:.88rem; max-width:100%; }
+body .app-shell main :is(input,textarea,select):focus { border-color:var(--section-color); box-shadow:0 0 0 3px var(--section-soft); }
+body .app-shell main input[type=checkbox] { accent-color:var(--section-color); }
+body .app-shell main .field > label { font-size:.82rem; font-weight:600; }
+body .app-shell main .flash { border-radius:12px; font-size:.85rem; padding:13px 16px; }
+body .app-shell main .empty-state { border:1px dashed var(--section-border); background:var(--section-soft); border-radius:18px; padding:28px; font-size:.9rem; }
+body .app-shell main .calendar-nav h2 { font-size:1.15rem; }
+body .app-shell .sidebar:not(.admin-sidebar) .sidebar-link { font-weight:600; min-height:46px; border-radius:10px; }
+body .app-shell .sidebar:not(.admin-sidebar) .sidebar-link[href="/diary.php"] { background:#dff1e3; color:#187b35; box-shadow:inset 0 0 0 1px #bedec7; }
+body .app-shell .sidebar:not(.admin-sidebar) .sidebar-link[href="/goals.php"] { background:#ece1f7; color:#6b25b6; box-shadow:inset 0 0 0 1px #d5bee9; }
+body .app-shell .sidebar:not(.admin-sidebar) .sidebar-link[href="/tracker.php"] { background:#f7e0f1; color:#b524a2; box-shadow:inset 0 0 0 1px #e9bde0; }
+body .app-shell .sidebar:not(.admin-sidebar) .sidebar-link[href="/profile.php"] { background:#e2e5dd; color:#333c31; box-shadow:inset 0 0 0 1px #cdd3c6; }
+body .app-shell .sidebar:not(.admin-sidebar) .sidebar-link.active { outline:2px solid currentColor; outline-offset:-2px; }
+body .app-shell .sidebar:not(.admin-sidebar) .sidebar-link:hover { filter:brightness(.97); }
+body .app-shell main .home-main-row h2 { font-size:1rem; }
+body .app-shell main .home-diary .btn-primary { background:#26b54f; border-color:#26b54f; color:#fff; }
+body .app-shell main .home-inspiration .quote-text { font-family:var(--font-body); font-size:1rem; letter-spacing:0; }
+body .app-shell main .cycle-calendar .calendar-nav .btn { font-size:1.35rem; padding:5px 14px; }
+body .app-shell main .vision-canvas-panel { border-radius:18px; box-shadow:var(--shadow-card); }
+@media(max-width:650px) {
+ body .app-shell .page-hero { padding-top:24px; padding-bottom:12px; margin-bottom:12px; }
+ body .app-shell main > .container > .card,
+ body .app-shell main .card-grid > .card { padding:18px; }
+ body .app-shell .card-grid { gap:14px; }
+ body .app-shell main > .container > .flex-between { flex-wrap:wrap; gap:12px; }
+ body .app-shell main > .container > .flex-between > .flex { flex-wrap:wrap; }
+}
+@media(prefers-reduced-motion:reduce) { body .app-shell main .btn { transition:none; } }
+
+/* Visionboard controls use the same card system as the other pages. */
+body .app-shell main .vision-workspace { gap:20px; }
+body .app-shell main .vision-canvas-panel,
+body .app-shell main .vision-tool.card,
+body .app-shell main .saved-vision-card.card { border:1px solid var(--color-border); border-radius:18px; padding:24px; background:#fff; box-shadow:var(--shadow-card); }
+body .app-shell main .vision-tools { display:flex; flex-direction:column; gap:20px; }
+body .app-shell main .vision-tools > .card { margin:0; }
+body .app-shell main .vision-board-heading { margin-bottom:20px; gap:12px; }
+body .app-shell main .vision-board-heading h2 { font-size:1.2rem; line-height:1.35; letter-spacing:-.02em; color:var(--color-ink); margin:0; }
+body .app-shell main .vision-tool summary { font-size:.95rem; line-height:1.4; font-weight:600; color:var(--color-ink); }
+body .app-shell main .vision-tool[open] summary { margin-bottom:20px; }
+body .app-shell main .vision-count { background:var(--section-soft); color:var(--section-dark); font-size:.7rem; padding:5px 9px; }
+body .app-shell main .vision-tool .btn { width:auto; }
+body .app-shell main .vision-tool .field > label { color:var(--color-ink); }
+body .app-shell main .vision-board-help { color:var(--color-muted); font-size:.75rem; margin:12px 0 0; }
+body .app-shell main .manifest-bar { gap:12px; margin-top:20px; flex-wrap:wrap; }
+body .app-shell main .saved-visions { margin-top:28px; }
+body .app-shell main .saved-visions > h2 { font-size:1.2rem; letter-spacing:-.02em; }
+body .app-shell main .saved-vision-grid { gap:20px; }
+@media(max-width:650px) {
+ body .app-shell main .vision-canvas-panel,
+ body .app-shell main .vision-tool.card,
+ body .app-shell main .saved-vision-card.card { padding:18px; }
+ body .app-shell main .vision-workspace,
+ body .app-shell main .vision-tools { gap:14px; }
+}
+
+/* Diary calendar matches the shared page and calendar cards. */
+body .app-shell main .diary-calendar { max-width:none; margin:0; padding:24px; border:1px solid var(--color-border); border-radius:18px; background:#fff; box-shadow:var(--shadow-card); }
+body .app-shell main .diary-calendar .calendar-nav { margin-bottom:8px; gap:12px; }
+body .app-shell main .diary-calendar .calendar-nav h2 { font-size:1.2rem; color:var(--color-ink); }
+body .app-shell main .diary-calendar .calendar-nav .btn { padding:5px 14px; font-size:1.35rem; }
+.diary-calendar-hint { text-align:center; font-size:.8rem; color:var(--color-muted); margin:0 0 24px; }
+body .app-shell main .diary-calendar .calendar-grid { gap:8px; }
+body .app-shell main .diary-calendar .calendar-day { aspect-ratio:auto; height:72px; min-height:0; max-height:none; border-radius:12px; font-size:.9rem; background:#f5f8f4; color:#52634f; }
+body .app-shell main .diary-calendar .calendar-day.empty { background:none; }
+body .app-shell main .diary-calendar .calendar-day.has-entry { background:#e1f1e5; }
+body .app-shell main .diary-calendar .calendar-day.today { background:#26b54f; border-color:#26b54f; color:#143d20; }
+body .app-shell main .diary-calendar .calendar-day:hover { border-color:#187b35; }
+.diary-calendar-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; border-top:1px solid var(--color-border); margin-top:24px; padding-top:18px; }
+body .app-shell main .diary-calendar .calendar-legend { border:0; padding:0; margin:0; gap:16px; }
+@media(max-width:650px) {
+ body .app-shell main .diary-calendar { padding:18px 12px; }
+ body .app-shell main .diary-calendar .calendar-grid { gap:4px; }
+ body .app-shell main .diary-calendar .calendar-day { height:46px; font-size:.8rem; border-radius:9px; }
+ .diary-calendar-footer { gap:14px; }
+}
+
+/* Day entry shares the diary layout, with colour-coded supporting tools. */
+body .app-shell main .day-layout { gap:20px; grid-template-columns:minmax(0,1fr) 310px; }
+body .app-shell main .day-writing-grid { gap:20px; }
+body .app-shell main .day-writing-grid .card,
+body .app-shell main .day-notes.card,
+body .app-shell main .day-trackers > .card { padding:24px; border:1px solid var(--color-border); border-radius:18px; box-shadow:var(--shadow-card); }
+body .app-shell main .day-morning,
+body .app-shell main .day-evening { background:#fff; }
+body .app-shell main .day-writing-grid h2 { color:#187b35; }
+body .app-shell main .day-writing-grid h2 > span { font-size:1rem; margin-right:5px; }
+body .app-shell main .day-entry-form textarea { resize:vertical; line-height:1.65; min-height:96px; }
+body .app-shell main .day-notes { margin-top:20px; }
+body .app-shell main .day-notes > label { display:block; margin:0 0 8px; }
+body .app-shell main .day-save { padding:20px 0 0; }
+body .app-shell main .day-save .btn-primary { color:#fff; }
+body .app-shell main .day-trackers { --section-color:#b524a2; --section-dark:#911d82; --section-soft:#fbedf8; --section-border:#efc8e8; --section-ink:#fff; }
+body .app-shell main .day-trackers > .card { background:#fff8fc; border-color:#eee1e9; }
+body .app-shell main .day-trackers h2 { color:#911d82; }
+body .app-shell main .day-trackers .btn-sm { font-size:.73rem; padding:8px 10px; }
+body .app-shell main .day-goals { --section-color:#6b25b6; --section-dark:#561e92; --section-soft:#f3ecfb; --section-border:#dfccf2; }
+body .app-shell main .day-goals summary { color:#6b25b6; }
+.day-choice-label { flex-basis:100%; font-size:.75rem; font-weight:600; color:#85677b; margin:6px 0 2px; }
+.day-cycle-drop { display:inline-flex; color:#d2b9c9; }
+.day-cycle-drop svg { width:16px; height:16px; }
+input:checked + .day-cycle-drop { color:#ce3e56; }
+input:checked + .day-cycle-drop svg { fill:currentColor; stroke:currentColor; }
+@media(max-width:800px) { body .app-shell main .day-layout { grid-template-columns:1fr; } }
+@media(max-width:650px) {
+ body .app-shell main .day-writing-grid .card,
+ body .app-shell main .day-notes.card,
+ body .app-shell main .day-trackers > .card { padding:18px; }
+ body .app-shell main .day-writing-grid { gap:14px; }
+}
+
+body .app-shell main .day-trackers > .card { padding:20px; background:#fff; }
+.day-tracker-block { margin:18px 0 0; padding:16px 0 0; border-top:1px solid #eee5ec; }
+.day-tracker-heading { display:flex; justify-content:space-between; gap:10px; margin-bottom:12px; font-size:.85rem; color:#79516e; }
+.day-tracker-heading > span { color:#a72d91; font-size:.8rem; }
+.day-water-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+body .app-shell main .day-water-actions .btn { padding:8px 3px; font-size:.72rem; white-space:nowrap; }
+.day-sleep-field { display:grid; grid-template-columns:65px minmax(0,1fr); align-items:center; gap:10px; margin-top:10px; }
+.day-sleep-field label { margin:0; font-size:.76rem; color:#7c6e77; }
+body .app-shell main .day-sleep-field select { width:100%; padding:9px; font-size:.78rem; }
+body .app-shell main .day-trackers .day-goals { margin-top:18px; padding-top:16px; }
+.day-trackers .checkbox-row { margin-bottom:0; }
+
+body .app-shell main .day-trackers > .day-goals-card { --section-color:#6b25b6; --section-dark:#561e92; --section-soft:#f3ecfb; --section-border:#dfccf2; margin-top:20px; padding:20px; background:#fbf8fe; border-color:#e8dcf2; }
+.day-goals-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+body .app-shell main .day-goals-heading h2 { color:#6b25b6; margin:0; font-size:1rem; }
+.day-goals-heading > span { font-size:.72rem; color:#806692; background:#f0e7f8; border-radius:20px; padding:4px 9px; white-space:nowrap; }
+.day-goals-list { display:grid; gap:8px; }
+.day-goal-option { display:flex; align-items:flex-start; gap:10px; padding:12px; border:1px solid #e9dff1; background:white; border-radius:10px; cursor:pointer; }
+body .app-shell main .day-goal-option input { width:18px; height:18px; margin:1px 0 0; flex:0 0 18px; accent-color:#6b25b6; }
+.day-goal-option span { font-size:.82rem; line-height:1.5; color:#584567; overflow-wrap:anywhere; }
+.day-goal-option input:checked + span { color:#806b90; text-decoration:line-through; }
+body .app-shell main .day-goals-save { margin-top:14px; width:100%; }
+
+/* Matching side cards: category colour is an accent, not a separate layout. */
+body .app-shell main .day-trackers > .day-goals-card { background:#fff; border-color:#eee1e9; padding:20px; }
+body .app-shell main .day-goals-heading h2 { font-size:1.2rem; line-height:1.35; }
+.day-goals-heading { margin-bottom:12px; }
+.day-goals-heading > span { padding:0; background:none; border-radius:0; font-size:.8rem; color:#806692; }
+.day-goals-list { gap:0; border-top:1px solid #eee5ec; }
+.day-goal-option { padding:14px 0; border:0; border-bottom:1px solid #eee5ec; border-radius:0; background:transparent; }
+.day-goal-option span { color:var(--color-ink); font-size:.84rem; }
+body .app-shell main .day-goals-save { width:auto; margin-top:16px; }

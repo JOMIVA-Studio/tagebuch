@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Sucht User, die laenger als der eingestellte Schwellenwert inaktiv sind,
+ * Sucht User, die länger als der eingestellte Schwellenwert inaktiv sind,
  * Erinnerungs-Mails aktiviert haben und in den letzten 24h noch keine
  * Erinnerung bekommen haben, und verschickt die "inactivity_reminder"-Vorlage.
  * Wird sowohl vom manuellen Admin-Button als auch vom Cron-Skript genutzt.

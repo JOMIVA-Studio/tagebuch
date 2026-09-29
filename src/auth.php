@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 /**
- * Auth fuer normale App-User. Eigener Session-Cookie-Name, damit ein
+ * Auth für normale App-User. Eigener Session-Cookie-Name, damit ein
  * gleichzeitig eingeloggter Admin (siehe admin_auth.php) im selben
- * Browser davon komplett unabhaengig ist.
+ * Browser davon komplett unabhängig ist.
  */
 function user_session_start(): void
 {
@@ -66,7 +66,7 @@ function touch_user_activity(int $userId): void
     $stmt->execute(['id' => $userId]);
 }
 
-/** Mindestens ein Ziel ist Pflicht: prueft, ob der User bereits eines hat. */
+/** Mindestens ein Ziel ist Pflicht: prüft, ob der User bereits eines hat. */
 function user_has_goal(int $userId): bool
 {
     $stmt = db()->prepare('SELECT COUNT(*) FROM goals WHERE user_id = :id');
