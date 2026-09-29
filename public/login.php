@@ -14,17 +14,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $emailValue = trim($_POST['email'] ?? '');
     $password = (string) ($_POST['password'] ?? '');
 
-    $stmt = db()->prepare('SELECT * FROM users WHERE email = :email');
-    $stmt->execute(['email' => $emailValue]);
-    $user = $stmt->fetch();
+    if (throttle_too_many('login', $emailValue)) {
+        $errors[] = throttle_message();
+    } else {
+        $stmt = db()->prepare('SELECT * FROM users WHERE email = :email');
+        $stmt->execute(['email' => $emailValue]);
+        $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password_hash'])) {
-        login_user((int) $user['id']);
-        flash('success', 'Willkommen zurück, ' . $user['name'] . '!');
-        redirect('/dashboard.php');
+        if ($user && password_verify($password, $user['password_hash'])) {
+            throttle_clear('login', $emailValue);
+            login_user((int) $user['id']);
+            flash('success', 'Willkommen zurück, ' . $user['name'] . '!');
+            redirect('/dashboard.php');
+        }
+
+        throttle_hit('login', $emailValue);
+        $errors[] = 'E-Mail oder Passwort ist falsch.';
     }
-
-    $errors[] = 'E-Mail oder Passwort ist falsch.';
 }
 
 $pageTitle = 'Anmelden';
@@ -53,6 +59,7 @@ require __DIR__ . '/partials/header.php';
   </form>
 
   <p class="text-center mt-md small text-muted">
+    <a href="/forgot_password.php">Passwort vergessen?</a> ·
     Noch kein Konto? <a href="/register.php">Jetzt registrieren</a>
   </p>
 </div>

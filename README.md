@@ -62,8 +62,11 @@ mit, grafischer Installer):
 ### Admin-Bereich
 
 - URL: `http://localhost:8888/admin/login.php`
-- Standardzugang: **admin** / **admin123**
-- Bitte direkt nach dem ersten Login unter *Passwort* aendern.
+- Zugang anlegen (es gibt keinen Standardzugang mehr):
+  `/Applications/MAMP/bin/php/php8.3.30/bin/php bin/create-admin.php admin`
+  (leer gelassenes Passwort = zufaelliges Passwort wird erzeugt und einmalig angezeigt).
+- Admins, die noch das fruehere Standardpasswort haben, muessen beim naechsten
+  Login ein neues Passwort (mind. 12 Zeichen) setzen.
 - Unter *SMTP* die Mailserver-Zugangsdaten hinterlegen (inkl. Testmail-
   Button), unter *Mail-Vorlagen* die Texte anpassen, unter *Erinnerungen*
   den Inaktivitaets-Schwellenwert setzen und Erinnerungen manuell
@@ -71,7 +74,7 @@ mit, grafischer Installer):
 
   ```
   0 8 * * *  /Applications/MAMP/bin/php/php8.3.30/bin/php \
-             "/Users/anjajyotistiefel/Documents/Neue App/cron/send_inactivity_reminders.php"
+             "/Users/anjajyotistiefel/Documents/Claude Apps/Neue App/cron/send_inactivity_reminders.php"
   ```
 
   (getestet und funktionsfaehig mit der oben installierten PHP-Version;
@@ -101,3 +104,40 @@ cron/              Skript fuer den Erinnerungs-Cronjob
 
 Lokales Repository (`git init`), noch ohne Remote. `.gitignore` schliesst
 `src/config.php` (lokale Zugangsdaten) sowie `.DS_Store`/Logs aus.
+
+## Sicherheits-Update (September 2026)
+
+Die Datenbank-Aenderungen (`016_security.sql`) laufen beim naechsten Seitenaufruf
+automatisch. Fuer bestehende Daten einmalig ausfuehren:
+
+```bash
+/Applications/MAMP/bin/php/php8.3.30/bin/php bin/migrate-files.php
+```
+
+Das verschiebt hochgeladene Bilder aus `public/uploads/` nach `storage/uploads/`
+(danach nur noch mit Login ueber `/media.php` abrufbar) und lagert Bilder/PDFs
+gespeicherter Visionen aus der Datenbank nach `storage/manifestations/` aus.
+
+- **Login-Drosselung**: nach 5 Fehlversuchen pro E-Mail und IP (bzw. 30 pro IP)
+  15 Minuten Sperre – fuer User-Login, Admin-Login und „Passwort vergessen“.
+- **Passwort vergessen**: `/forgot_password.php` schickt einen 60 Minuten gueltigen
+  Link (Vorlage „Passwort zuruecksetzen“ in der Administration).
+- **Loeschen**: Beim Entfernen von Bildern, gespeicherten Visionen oder des ganzen
+  Kontos werden die Dateien mitgeloescht, sobald sie nirgends mehr verwendet werden.
+- **SMTP-Passwort** wird mit dem `app_key` verschluesselt gespeichert.
+- **Visionboard** skaliert auf allen Bildschirmgroessen als Ganzes; „PDF oeffnen“
+  zeigt nur eine Vorschau und legt keine neue gespeicherte Vision mehr an.
+- **Migrationen** werden nur noch geprueft, wenn neue Dateien dazukommen
+  (Merker in `storage/cache/`), und laufen unter einer Datenbank-Sperre.
+
+## Live-Betrieb (Checkliste)
+
+- Konfiguration ueber Umgebungsvariablen: `APP_URL` (mit `https://`), `APP_KEY`
+  (`php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`), `DB_HOST`, `DB_PORT`,
+  `DB_NAME`, `DB_USER`, `DB_PASS`. `APP_DEBUG` weglassen oder `0`.
+- Ohne eigenen `app_key` startet die App im Live-Modus bewusst nicht.
+- Fehler landen in `storage/logs/php-error.log`, Besucher sehen nur eine neutrale Seite.
+- Eigener Datenbank-Benutzer statt `root`, nur mit Rechten auf `tagebuch_app`.
+- `storage/` muss fuer PHP beschreibbar sein und darf nicht im Webroot liegen.
+- Datenschutzerklaerung (`public/datenschutz.php`) ist eine Vorlage: alle
+  `[Platzhalter]` ersetzen und rechtlich pruefen lassen.

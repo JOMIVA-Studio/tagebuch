@@ -14,16 +14,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $usernameValue = trim($_POST['username'] ?? '');
     $password = (string) ($_POST['password'] ?? '');
 
-    $stmt = db()->prepare('SELECT * FROM admins WHERE username = :u');
-    $stmt->execute(['u' => $usernameValue]);
-    $admin = $stmt->fetch();
+    if (throttle_too_many('admin_login', $usernameValue)) {
+        $errors[] = throttle_message();
+    } else {
+        $stmt = db()->prepare('SELECT * FROM admins WHERE username = :u');
+        $stmt->execute(['u' => $usernameValue]);
+        $admin = $stmt->fetch();
 
-    if ($admin && password_verify($password, $admin['password_hash'])) {
-        login_admin((int) $admin['id']);
-        redirect('/admin/index.php');
+        if ($admin && password_verify($password, $admin['password_hash'])) {
+            throttle_clear('admin_login', $usernameValue);
+            login_admin((int) $admin['id']);
+            redirect(!empty($admin['must_change_password']) ? '/admin/password.php' : '/admin/index.php');
+        }
+
+        throttle_hit('admin_login', $usernameValue);
+        $errors[] = 'Benutzername oder Passwort ist falsch.';
     }
-
-    $errors[] = 'Benutzername oder Passwort ist falsch.';
 }
 ?><!doctype html>
 <html lang="de">

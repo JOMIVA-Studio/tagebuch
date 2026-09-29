@@ -15,6 +15,7 @@ function user_session_start(): void
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
+        'secure'   => request_is_https(),
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -60,10 +61,20 @@ function logout_user(): void
     session_regenerate_id(true);
 }
 
+/**
+ * Merkt sich die letzte Aktivität (für Erinnerungsmails). Schreibt höchstens
+ * alle 5 Minuten in die Datenbank statt bei jedem Seitenaufruf.
+ */
 function touch_user_activity(int $userId): void
 {
+    $last = (int) ($_SESSION['activity_touched_at'] ?? 0);
+    if ($last > time() - 300 && ($_SESSION['activity_user_id'] ?? null) === $userId) {
+        return;
+    }
     $stmt = db()->prepare('UPDATE users SET last_activity_at = NOW() WHERE id = :id');
     $stmt->execute(['id' => $userId]);
+    $_SESSION['activity_touched_at'] = time();
+    $_SESSION['activity_user_id'] = $userId;
 }
 
 /** Mindestens ein Ziel ist Pflicht: prüft, ob der User bereits eines hat. */

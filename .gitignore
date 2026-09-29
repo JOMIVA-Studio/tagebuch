@@ -3,3 +3,6 @@ src/config.php
 *.log
 public/uploads/vision/*
 !public/uploads/vision/.gitkeep
+/storage/*
+!/storage/.gitkeep
+/archiv-bilder/

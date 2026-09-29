@@ -21,7 +21,9 @@
     if (pdfButton) pdfButton.disabled = true;
     const wasInert = board.inert;
     board.inert = true;
-    status.textContent = 'Deine Vision wird festgehalten …';
+    status.textContent = preview ? 'Deine PDF wird erstellt …' : 'Deine Vision wird festgehalten …';
+    // Immer in Originalgrösse aufnehmen – unabhängig davon, wie klein das Board gerade angezeigt wird.
+    if (window.visionBoardLayout) window.visionBoardLayout(1);
     try {
       let snapshot = preview ? null : pending;
       if (!snapshot) {
@@ -71,10 +73,23 @@
       form.set('csrf_token', document.querySelector('input[name="csrf_token"]').value);
       form.set('request_key', snapshot.key);
       form.set('image', snapshot.image);
+      if (preview) {
+        // Nur anzeigen, nicht speichern: der Server liefert die PDF direkt zurück.
+        form.set('preview', '1');
+        const response = await fetch('/vision_manifest.php', { method:'POST', body:form });
+        if (!response.ok || !(response.headers.get('Content-Type') || '').includes('application/pdf')) {
+          const result = await response.json().catch(() => ({}));
+          throw new Error(result.error || 'Die PDF konnte nicht erstellt werden.');
+        }
+        const url = URL.createObjectURL(await response.blob());
+        if (!popup.closed) popup.location.replace(url);
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        status.textContent = '';
+        return;
+      }
       const response = await fetch('/vision_manifest.php', { method:'POST', body:form });
       const result = await response.json().catch(() => ({ error:'Speichern nicht möglich. Bitte prüfe deine Anmeldung und versuche es erneut.' }));
       if (!response.ok || !result.id) throw new Error(result.error || 'Speichern fehlgeschlagen.');
-      if (popup && !popup.closed) popup.location.replace('/vision_file.php?id=' + result.id + '&format=pdf');
       location.href = '/vision.php?saved=' + result.id + '#savedVisions';
     } catch (error) {
       if (popup && !popup.closed) popup.close();
@@ -83,6 +98,7 @@
       button.disabled = false;
       if (pdfButton) pdfButton.disabled = false;
       board.inert = wasInert;
+      if (window.visionBoardLayout) window.visionBoardLayout();
     }
   }
   button.addEventListener('click', () => captureVision(false));

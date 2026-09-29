@@ -6,7 +6,7 @@ $pdo = db();
 $errors = [];
 $testResult = null;
 
-$settings = $pdo->query('SELECT * FROM smtp_settings WHERE id = 1')->fetch();
+$settings = smtp_settings();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$errors) {
             // Passwort nur überschreiben, wenn ein neues eingegeben wurde.
-            $passwordToStore = $password !== '' ? $password : $settings['password'];
+            $passwordToStore = app_encrypt($password !== '' ? $password : $settings['password']);
 
             $stmt = $pdo->prepare(
                 'UPDATE smtp_settings SET host=:host, port=:port, encryption=:enc, username=:user, password=:pass, from_email=:from_email, from_name=:from_name WHERE id = 1'

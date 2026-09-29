@@ -2,6 +2,7 @@
 require __DIR__ . '/../src/bootstrap.php';
 require_once __DIR__ . '/../src/vision_pdf.php';
 require_once __DIR__ . '/../src/vision_state.php';
+require_once __DIR__ . '/../src/uploads.php';
 header('Content-Type: application/json; charset=UTF-8');
 header('Cache-Control: no-store');
 $user = current_user();
@@ -36,9 +37,18 @@ if ($preview) {
     exit;
 }
 try {
-    $q = db()->prepare('INSERT INTO vision_manifestations (user_id,request_key,image_data,pdf_data,width,height,board_data) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)');
-    $q->execute([$user['id'], $key, $jpeg, $pdf, $info[0], $info[1], json_encode(vision_state(db(), (int)$user['id']), JSON_THROW_ON_ERROR)]);
-    echo json_encode(['id'=>(int)db()->lastInsertId()]);
+    // Bild und PDF liegen als Dateien in storage/manifestations/, nicht mehr als BLOB in der Datenbank.
+    $q = db()->prepare('INSERT INTO vision_manifestations (user_id,request_key,width,height,board_data) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)');
+    $q->execute([$user['id'], $key, $info[0], $info[1], json_encode(vision_state(db(), (int)$user['id']), JSON_THROW_ON_ERROR)]);
+    $newId = (int) db()->lastInsertId();
+    try {
+        store_manifestation_files((int) $user['id'], $newId, $jpeg, $pdf);
+    } catch (Throwable $e) {
+        db()->prepare('DELETE FROM vision_manifestations WHERE id=? AND user_id=?')->execute([$newId, $user['id']]);
+        throw $e;
+    }
+    echo json_encode(['id'=>$newId]);
 } catch (Throwable $e) {
+    error_log((string) $e);
     http_response_code(500); echo json_encode(['error'=>'Die Vision konnte nicht gespeichert werden. Bitte erneut versuchen.']);
 }

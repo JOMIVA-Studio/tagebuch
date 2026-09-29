@@ -16,6 +16,7 @@ function admin_session_start(): void
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/admin/',
+        'secure'   => request_is_https(),
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -44,6 +45,12 @@ function require_admin(): array
     $admin = current_admin();
     if ($admin === null) {
         redirect('/admin/login.php');
+    }
+    // Solange das Standard-/Initialpasswort aktiv ist, nur die Passwort-Seite zulassen.
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    if (!empty($admin['must_change_password']) && $path !== '/admin/password.php') {
+        flash('info', 'Bitte vergib zuerst ein neues, persönliches Passwort.');
+        redirect('/admin/password.php');
     }
     return $admin;
 }

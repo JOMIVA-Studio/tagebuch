@@ -129,7 +129,5 @@ INSERT IGNORE INTO email_templates (template_key, name, subject, body_html) VALU
    'Willkommen in deinem Tagebuch',
    '<p>Hallo {{name}},</p><p>dein Konto wurde erfolgreich erstellt. Wir freuen uns, dich auf deiner Reise zu begleiten.</p>');
 
--- Admin-Standardzugang: Benutzername "admin", Passwort "admin123"
--- WICHTIG: nach dem ersten Login unbedingt im Profil aendern!
-INSERT IGNORE INTO admins (username, password_hash) VALUES
-  ('admin', '$2b$10$cIdGwFRMiyzMWN9HpVgy6ubes/QD4nVkVDhhAxSFRIJiCJa7cIE.m');
+-- Admin-Zugänge werden bewusst NICHT per Migration angelegt, sondern per CLI mit eigenem Passwort:
+--   php bin/create-admin.php

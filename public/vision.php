@@ -21,6 +21,11 @@ $textFonts = ['hand'=>'Handschrift', 'script'=>'Verspielt', 'serif'=>'Elegant', 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $action = $_POST['action'] ?? '';
+    // Wird der Hintergrund ersetzt, räumen wir ein nicht mehr genutztes eigenes Hintergrundbild weg.
+    $previousBackground = $board['background_image'] ?? null;
+    register_shutdown_function(static function () use ($pdo, $user, $previousBackground): void {
+        delete_upload_if_unreferenced($pdo, (int) $user['id'], $previousBackground);
+    });
 
     if ($action === 'save_text') {
         $content = is_string($_POST['content'] ?? null) ? trim($_POST['content']) : '';
@@ -122,8 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete_item') {
         $id = (int) ($_POST['id'] ?? 0);
+        $stmt = $pdo->prepare('SELECT image_path FROM vision_items WHERE id = :id AND user_id = :uid');
+        $stmt->execute(['id' => $id, 'uid' => $user['id']]);
+        $imagePath = $stmt->fetchColumn();
         $stmt = $pdo->prepare('DELETE FROM vision_items WHERE id = :id AND user_id = :uid');
         $stmt->execute(['id' => $id, 'uid' => $user['id']]);
+        if (is_string($imagePath)) {
+            delete_upload_if_unreferenced($pdo, (int) $user['id'], $imagePath);
+        }
         redirect('/vision.php');
     }
 }
@@ -199,6 +210,7 @@ require __DIR__ . '/partials/header.php';
 <section class="vision-canvas-panel" aria-label="Dein Visionboard">
   <div class="vision-board-heading"><div><h2>Meine Vision</h2></div><span class="vision-count"><?= count($items) + count($textItems) ?> Elemente</span><button type="button" class="btn btn-ghost btn-sm vision-print-btn" id="visionPdfButton">PDF öffnen / drucken</button></div>
 <div id="visionBoard" class="vision-board <?= e($boardClass) ?>" style="<?= $boardStyle ?>">
+  <div id="visionStage" class="vision-stage">
   <?php foreach ($items as $item): ?>
     <div class="vision-item" data-id="<?= (int) $item['id'] ?>" style="left:<?= (int) $item['pos_x'] ?>px; top:<?= (int) $item['pos_y'] ?>px; width:<?= (int) $item['width'] ?>px; z-index:<?= (int) $item['z_index'] ?>;">
       <img src="<?= e($item['image_path']) ?>" alt="<?= e($item['caption'] ?? '') ?>" draggable="false">
@@ -217,6 +229,7 @@ require __DIR__ . '/partials/header.php';
       <div class="vision-text-actions"><a href="/vision.php?edit_text=<?= (int) $textItem['id'] ?>#textEditor" aria-label="Text bearbeiten">✎</a><form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="delete_text"><input type="hidden" name="id" value="<?= (int) $textItem['id'] ?>"><button type="submit" aria-label="Text entfernen">×</button></form></div>
     </div>
   <?php endforeach; ?>
+  </div>
   <?php if (!$items && !$textItems): ?>
     <div class="vision-empty"><span class="vision-empty-icon" aria-hidden="true">✧</span><h2>Platz für deine Träume.</h2><p class="small">Füge dein erstes Bild hinzu.</p></div>
   <?php endif; ?>
@@ -316,7 +329,7 @@ require __DIR__ . '/partials/header.php';
   </div>
 </section>
 <script src="/assets/js/html-to-image.js"></script>
-<script src="/assets/js/manifest.js?v=3" defer></script>
+<script src="/assets/js/manifest.js?v=4" defer></script>
 <script>
 (function () {
   var board = document.getElementById('visionBoard');
@@ -332,6 +345,31 @@ require __DIR__ . '/partials/header.php';
   [textInput, fontInput, sizeInput].forEach(function(el) { el.addEventListener('input', updatePreview); });
   updatePreview();
   var csrfToken = document.querySelector('#visionBoard').closest('body').querySelector('input[name=csrf_token]').value;
+  var stage = document.getElementById('visionStage');
+
+  // Das Board hat eine feste "Leinwand" (mind. 760 x 560), die auf jede Bildschirmbreite
+  // skaliert wird. So sieht die Anordnung auf Handy und Computer gleich aus und nichts
+  // wird abgeschnitten. Positionen werden in Leinwand-Koordinaten gespeichert.
+  var DESIGN_WIDTH = 760, DESIGN_HEIGHT = 560, stageWidth = DESIGN_WIDTH, stageHeight = DESIGN_HEIGHT, scale = 1;
+  function layoutBoard(forcedScale) {
+    stageWidth = DESIGN_WIDTH; stageHeight = DESIGN_HEIGHT;
+    stage.querySelectorAll('.vision-item').forEach(function (item) {
+      stageWidth = Math.max(stageWidth, item.offsetLeft + item.offsetWidth + 8);
+      stageHeight = Math.max(stageHeight, item.offsetTop + item.offsetHeight + 8);
+    });
+    stage.style.width = stageWidth + 'px';
+    stage.style.height = stageHeight + 'px';
+    board.classList.add('is-scaled');
+    board.style.width = forcedScale ? stageWidth * forcedScale + 'px' : '';
+    scale = forcedScale || board.clientWidth / stageWidth;
+    stage.style.transform = 'scale(' + scale + ')';
+    board.style.height = Math.round(stageHeight * scale) + 'px';
+  }
+  window.visionBoardLayout = layoutBoard;
+  layoutBoard();
+  window.addEventListener('resize', function () { layoutBoard(); });
+  if (document.fonts) document.fonts.ready.then(function () { layoutBoard(); });
+  stage.querySelectorAll('img').forEach(function (img) { if (!img.complete) img.addEventListener('load', function () { layoutBoard(); }); });
 
   function savePosition(item) {
     var data = new URLSearchParams();
@@ -345,27 +383,31 @@ require __DIR__ . '/partials/header.php';
     }).catch(function() { alert('Position konnte nicht gespeichert werden. Bitte versuche es erneut.'); });
   }
 
-  board.querySelectorAll('.vision-item').forEach(function (item) {
-    var active = false, offsetX = 0, offsetY = 0, boardRect = null;
+  stage.querySelectorAll('.vision-item').forEach(function (item) {
+    var active = false, offsetX = 0, offsetY = 0;
+
+    function pointerInStage(e) {
+      var rect = stage.getBoundingClientRect();
+      return { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+    }
 
     item.addEventListener('pointerdown', function (e) {
       if (e.target.closest('a, button, input, textarea, select')) return;
       active = true;
-      boardRect = board.getBoundingClientRect();
-      offsetX = e.clientX - item.offsetLeft;
-      offsetY = e.clientY - item.offsetTop;
+      var p = pointerInStage(e);
+      offsetX = p.x - item.offsetLeft;
+      offsetY = p.y - item.offsetTop;
       item.style.zIndex = 999;
       item.setPointerCapture(e.pointerId);
     });
 
     item.addEventListener('pointermove', function (e) {
       if (!active) return;
-      var x = e.clientX - offsetX;
-      var y = e.clientY - offsetY;
-      x = Math.max(0, Math.min(x, boardRect.width - item.offsetWidth));
-      y = Math.max(0, Math.min(y, boardRect.height - item.offsetHeight));
-      item.style.left = x + 'px';
-      item.style.top = y + 'px';
+      var p = pointerInStage(e);
+      var x = Math.max(0, Math.min(p.x - offsetX, stageWidth - item.offsetWidth));
+      var y = Math.max(0, Math.min(p.y - offsetY, stageHeight - item.offsetHeight));
+      item.style.left = Math.round(x) + 'px';
+      item.style.top = Math.round(y) + 'px';
     });
 
     item.addEventListener('pointercancel', function () { active = false; });

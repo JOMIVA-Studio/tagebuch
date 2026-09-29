@@ -1,0 +1,9 @@
+# Alte Upload-Ablage: Dateien werden nicht mehr öffentlich ausgeliefert.
+# Neue Uploads liegen in storage/uploads/ und laufen über /media.php (nur mit Login).
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>

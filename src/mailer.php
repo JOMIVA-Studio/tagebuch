@@ -144,11 +144,13 @@ function send_templated_mail(string $templateKey, array $user, array $placeholde
         throw new RuntimeException("Mail-Vorlage '$templateKey' ist nicht in der Administration hinterlegt.");
     }
 
-    $smtpSettings = $pdo->query('SELECT * FROM smtp_settings WHERE id = 1')->fetch() ?: [];
+    $smtpSettings = smtp_settings();
 
+    // Platzhalter-Werte stammen teils aus Nutzereingaben (z. B. Name) und werden im HTML
+    // deshalb immer escaped, damit niemand eigenes HTML oder Links in Mails einschleusen kann.
     $replace = array_merge(['name' => $user['name'] ?? '', 'email' => $user['email'] ?? ''], $placeholders);
-    $subject = strtr($template['subject'], wrap_placeholders($replace));
-    $body = strtr($template['body_html'], wrap_placeholders($replace));
+    $subject = strtr($template['subject'], wrap_placeholders($replace, false));
+    $body = strtr($template['body_html'], wrap_placeholders($replace, true));
 
     try {
         $mailer = SmtpMailer::fromSettings($smtpSettings);
@@ -161,11 +163,13 @@ function send_templated_mail(string $templateKey, array $user, array $placeholde
     }
 }
 
-function wrap_placeholders(array $values): array
+function wrap_placeholders(array $values, bool $html): array
 {
     $wrapped = [];
     foreach ($values as $key => $value) {
-        $wrapped['{{' . $key . '}}'] = (string) $value;
+        $wrapped['{{' . $key . '}}'] = $html
+            ? htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8')
+            : str_replace(["\r", "\n"], ' ', (string) $value);
     }
     return $wrapped;
 }

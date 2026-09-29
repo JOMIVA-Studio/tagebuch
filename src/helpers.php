@@ -10,6 +10,58 @@ function app_config(): array
     return $config;
 }
 
+/** Absolute URL für Links in E-Mails (aus der Konfiguration, nie aus dem Host-Header). */
+function app_url(string $path = ''): string
+{
+    return rtrim((string) (app_config()['app_url'] ?? 'http://localhost:8890'), '/') . '/' . ltrim($path, '/');
+}
+
+/**
+ * Verschlüsselt Geheimnisse (z. B. das SMTP-Passwort) mit dem app_key aus der Konfiguration,
+ * damit sie nicht im Klartext in der Datenbank oder in Backups stehen.
+ */
+function app_encrypt(string $plain): string
+{
+    if ($plain === '') {
+        return '';
+    }
+    $iv = random_bytes(12);
+    $cipher = openssl_encrypt($plain, 'aes-256-gcm', app_crypto_key(), OPENSSL_RAW_DATA, $iv, $tag);
+    return 'enc:v1:' . base64_encode($iv . $tag . $cipher);
+}
+
+function app_decrypt(?string $stored): string
+{
+    $stored = (string) $stored;
+    if (!str_starts_with($stored, 'enc:v1:')) {
+        return $stored; // ältere, noch unverschlüsselte Werte
+    }
+    $raw = base64_decode(substr($stored, 7), true);
+    if ($raw === false || strlen($raw) < 29) {
+        return '';
+    }
+    $plain = openssl_decrypt(substr($raw, 28), 'aes-256-gcm', app_crypto_key(), OPENSSL_RAW_DATA, substr($raw, 0, 12), substr($raw, 12, 16));
+    return $plain === false ? '' : $plain;
+}
+
+function app_crypto_key(): string
+{
+    return hash('sha256', (string) (app_config()['app_key'] ?? ''), true);
+}
+
+/** SMTP-Einstellungen mit entschlüsseltem Passwort; verschlüsselt Altbestände beim ersten Lesen. */
+function smtp_settings(): array
+{
+    $pdo = db();
+    $settings = $pdo->query('SELECT * FROM smtp_settings WHERE id = 1')->fetch() ?: [];
+    $stored = (string) ($settings['password'] ?? '');
+    if ($stored !== '' && !str_starts_with($stored, 'enc:v1:')) {
+        $pdo->prepare('UPDATE smtp_settings SET password = :pass WHERE id = 1')->execute(['pass' => app_encrypt($stored)]);
+    }
+    $settings['password'] = app_decrypt($stored);
+    return $settings;
+}
+
 function e(?string $value): string
 {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');

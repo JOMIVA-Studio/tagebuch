@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/../src/bootstrap.php';
+require_once __DIR__ . '/../src/uploads.php';
 
 $user = require_login();
 touch_user_activity((int) $user['id']);
@@ -79,6 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $stmt = $pdo->prepare('DELETE FROM users WHERE id = :id');
             $stmt->execute(['id' => $user['id']]);
+            // Hochgeladene Bilder und gespeicherte Visionen ebenfalls entfernen
+            delete_all_user_files((int) $user['id']);
             logout_user();
             flash('success', 'Dein Konto und alle zugehörigen Daten wurden gelöscht.');
             redirect('/login.php');

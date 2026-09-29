@@ -93,6 +93,7 @@ require __DIR__ . '/partials/header.php';
       <label for="password_confirm">Passwort bestätigen</label>
       <input type="password" id="password_confirm" name="password_confirm" required minlength="8">
     </div>
+    <p class="small text-muted mt-md mb-0">Wie wir mit deinen Daten umgehen – auch mit Zyklusdaten, falls du den Zyklus-Tracker nutzt – steht in der <a href="/datenschutz.php" target="_blank">Datenschutzerklärung</a>.</p>
     <button type="submit" class="btn btn-primary btn-block mt-md">Registrieren</button>
   </form>
 

@@ -847,3 +847,9 @@ body.home-neutral.profile-neutral .sidebar-nav .sidebar-link { font-weight:600; 
 .phase-status-slot { min-height:30px; }
 .phase-status-slot .phase-current { margin-top:8px; }
 .phase-overview-card > .phase-more { margin-top:12px; }
+
+/* Rechtliche Seiten */
+.legal-page { max-width: 760px; margin: 0 auto 24px; }
+.legal-page h3 { margin-top: 1.4em; }
+.legal-page ul { padding-left: 1.2em; }
+.legal-links { margin: 32px 0 16px; }

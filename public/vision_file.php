@@ -1,13 +1,12 @@
 <?php
 require __DIR__ . '/../src/bootstrap.php';
+require_once __DIR__ . '/../src/uploads.php';
 $user = current_user();
 if (!$user) { http_response_code(401); exit; }
 $id = (int) ($_GET['id'] ?? 0);
 $isPdf = ($_GET['format'] ?? '') === 'pdf';
-$column = $isPdf ? 'pdf_data' : 'image_data';
-$q = db()->prepare("SELECT $column FROM vision_manifestations WHERE id=? AND user_id=?");
-$q->execute([$id, $user['id']]); $data = $q->fetchColumn();
-if ($data === false) { http_response_code(404); exit; }
+$data = manifestation_contents(db(), (int) $user['id'], $id, $isPdf ? 'pdf' : 'jpg');
+if ($data === null) { http_response_code(404); exit; }
 header('Content-Type: ' . ($isPdf ? 'application/pdf' : 'image/jpeg'));
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: private, no-store');
