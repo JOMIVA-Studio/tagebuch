@@ -23,8 +23,9 @@ $navItems = [
   <title><?= e($pageTitle ?? 'Administration') ?> · <?= e($appName) ?> Admin</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/admin.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../../assets/css/admin.css'), 0, 12) ?>">
 </head>
-<body>
+<body class="admin-area">
 <div class="app-shell">
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
   <aside class="sidebar admin-sidebar" id="sidebar">

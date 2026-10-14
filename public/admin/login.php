@@ -39,8 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Admin-Anmeldung</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/admin.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../assets/css/admin.css'), 0, 12) ?>">
 </head>
-<body style="background:var(--color-dark); min-height:100vh; display:flex; align-items:center;">
+<body class="admin-area admin-login">
   <div class="container">
     <div class="stack-narrow card">
       <div class="text-center">

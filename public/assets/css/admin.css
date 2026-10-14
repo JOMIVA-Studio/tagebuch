@@ -1,0 +1,16 @@
+/* Administration: Violett aus dem Logo (#6b25b6) statt Grün des Nutzerbereichs. */
+body.admin-area {
+  --color-green: #6b25b6;
+  --color-green-dark: #561e92;
+  --color-purple-dark: #3f1568;
+}
+body.admin-area .sidebar.admin-sidebar { background: #6b25b6; }
+body.admin-area .sidebar.admin-sidebar .sidebar-link.active { background: #fff; color: #561e92; }
+body.admin-area .sidebar-user-avatar { background: #efe6fa; color: #3f1568; }
+body.admin-area .btn-secondary { background: #3f1568; }
+body.admin-area .btn-secondary:hover { background: #2d0f4a; }
+body.admin-area input:focus, body.admin-area textarea:focus, body.admin-area select:focus {
+  border-color: #6b25b6; box-shadow: 0 0 0 3px rgba(107, 37, 182, .18);
+}
+body.admin-area :focus-visible { outline-color: #6b25b6; }
+body.admin-login { background: #6b25b6; min-height: 100vh; display: flex; align-items: center; }
