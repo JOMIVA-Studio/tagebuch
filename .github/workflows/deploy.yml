@@ -24,7 +24,7 @@ jobs:
           username: jomivac1
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
-          server-dir: tagebuch/
+          server-dir: tagebuch.jomiva.com/
           exclude: |
             **/.git*
             **/.git*/**
