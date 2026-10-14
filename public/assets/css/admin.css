@@ -14,3 +14,8 @@ body.admin-area input:focus, body.admin-area textarea:focus, body.admin-area sel
 }
 body.admin-area :focus-visible { outline-color: #6b25b6; }
 body.admin-login { background: #6b25b6; min-height: 100vh; display: flex; align-items: center; }
+
+/* Menü beim Darüberfahren: violett statt grün */
+body.admin-area .sidebar.admin-sidebar .sidebar-link:hover { background: rgba(255, 255, 255, .18); color: #fff; }
+body.admin-area .sidebar.admin-sidebar .sidebar-link.active:hover { background: #fff; color: #561e92; }
+body.admin-area input[type=checkbox], body.admin-area input[type=radio] { accent-color: #6b25b6; }
