@@ -7,8 +7,8 @@ body.admin-area {
 body.admin-area .sidebar.admin-sidebar { background: #6b25b6; }
 body.admin-area .sidebar.admin-sidebar .sidebar-link.active { background: #fff; color: #561e92; }
 body.admin-area .sidebar-user-avatar { background: #efe6fa; color: #3f1568; }
-body.admin-area .btn-secondary { background: #3f1568; }
-body.admin-area .btn-secondary:hover { background: #2d0f4a; }
+body.admin-area .btn-secondary { background: #6b25b6; }
+body.admin-area .btn-secondary:hover { background: #561e92; }
 body.admin-area input:focus, body.admin-area textarea:focus, body.admin-area select:focus {
   border-color: #6b25b6; box-shadow: 0 0 0 3px rgba(107, 37, 182, .18);
 }
