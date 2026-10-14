@@ -1,5 +1,14 @@
 # Mein Tagebuch – Server-Einstellungen (Apache / LiteSpeed)
 
+# Gilt dieser Ordner als Webroot: die Sperre aus dem Projektordner (../.htaccess) hier aufheben
+<IfModule mod_authz_core.c>
+  Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Allow from all
+</IfModule>
+
 # Immer HTTPS
 RewriteEngine On
 RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$
