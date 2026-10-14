@@ -178,3 +178,5 @@ body.auth-page main .btn-primary { background:#26b54f; border-color:#26b54f; col
 body.auth-page main .btn-primary:hover { background:#1e913f; border-color:#1e913f; color:#fff; }
 body.auth-page main input:focus, body.auth-page main textarea:focus, body.auth-page main select:focus { border-color:#26b54f; box-shadow:0 0 0 3px rgba(38,181,79,.18); }
 body.auth-page[class^="theme-"] main a:not(.btn):not(.card):not(.calendar-day):not(.logo) { color:#6b25b6; }
+body.auth-page .stack-narrow > .badge { display:table; margin-left:auto; margin-right:auto; }
+body.auth-page .stack-narrow > h2 { text-align:center; }
