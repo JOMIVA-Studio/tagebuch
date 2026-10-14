@@ -6,3 +6,4 @@ public/uploads/vision/*
 /storage/*
 !/storage/.gitkeep
 /archiv-bilder/
+/release/
