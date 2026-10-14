@@ -21,7 +21,7 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftp.jomiva.com
-          username: jomivac1
+          username: github@tagebuch.jomiva.com
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           server-dir: tagebuch.jomiva.com/
