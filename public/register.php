@@ -6,6 +6,7 @@ if (current_user()) {
 }
 
 $errors = [];
+$inviteCode = registration_invite_code();
 $nameValue = '';
 $emailValue = '';
 
@@ -17,6 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = (string) ($_POST['password'] ?? '');
     $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
 
+    if ($inviteCode !== null) {
+        $givenCode = trim((string) ($_POST['invite_code'] ?? ''));
+        if (throttle_too_many('register', 'invite')) {
+            $errors[] = throttle_message();
+        } elseif (!hash_equals($inviteCode, $givenCode)) {
+            throttle_hit('register', 'invite');
+            $errors[] = 'Der Einladungscode stimmt nicht.';
+        }
+    }
     if ($nameValue === '') {
         $errors[] = 'Bitte gib deinen Namen ein.';
     }
@@ -76,9 +86,16 @@ require __DIR__ . '/partials/header.php';
 
   <form method="post" class="card">
     <?= csrf_field() ?>
+    <?php if ($inviteCode !== null): ?>
+      <div class="field">
+        <label for="invite_code">Einladungscode</label>
+        <input type="text" id="invite_code" name="invite_code" required autocomplete="off" autofocus>
+        <div class="hint">Den Code bekommst du von der Betreiberin.</div>
+      </div>
+    <?php endif; ?>
     <div class="field">
       <label for="name">Name</label>
-      <input type="text" id="name" name="name" required value="<?= e($nameValue) ?>" autofocus>
+      <input type="text" id="name" name="name" required value="<?= e($nameValue) ?>"<?= $inviteCode === null ? ' autofocus' : '' ?>>
     </div>
     <div class="field">
       <label for="email">E-Mail</label>

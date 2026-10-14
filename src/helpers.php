@@ -151,3 +151,10 @@ function app_icon_key(?string $key): string
 {
     return $key !== null && isset(app_icon_choices()[$key]) ? $key : 'gruen';
 }
+
+/** Einladungscode für die Registrierung; leer/NULL = jeder darf sich registrieren. */
+function registration_invite_code(): ?string
+{
+    $code = trim((string) db()->query('SELECT invite_code FROM app_settings WHERE id = 1')->fetchColumn());
+    return $code !== '' ? $code : null;
+}

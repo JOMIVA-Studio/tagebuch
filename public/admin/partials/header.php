@@ -13,6 +13,7 @@ $navItems = [
     ['href' => 'templates.php',  'label' => 'Mail-Vorlagen', 'icon' => 'mail', 'alsoActive' => 'template_edit.php'],
     ['href' => 'smtp.php',       'label' => 'SMTP',          'icon' => 'server'],
     ['href' => 'reminders.php',  'label' => 'Erinnerungen',  'icon' => 'bell'],
+    ['href' => 'registration.php', 'label' => 'Registrierung', 'icon' => 'user'],
     ['href' => 'password.php',   'label' => 'Passwort',      'icon' => 'lock'],
 ];
 ?><!doctype html>
