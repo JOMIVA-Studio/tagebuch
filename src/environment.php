@@ -16,7 +16,11 @@ function init_app_environment(): void
     error_reporting(E_ALL);
     ini_set('display_errors', app_debug() ? '1' : '0');
     ini_set('log_errors', '1');
-    ini_set('error_log', __DIR__ . '/../storage/logs/php-error.log');
+    $logDir = __DIR__ . '/../storage/logs';
+    if (!is_dir($logDir)) {
+        @mkdir($logDir, 0750, true);
+    }
+    ini_set('error_log', $logDir . '/php-error.log');
 
     set_exception_handler(static function (Throwable $e): void {
         error_log((string) $e);

@@ -139,5 +139,5 @@ gespeicherter Visionen aus der Datenbank nach `storage/manifestations/` aus.
 - Fehler landen in `storage/logs/php-error.log`, Besucher sehen nur eine neutrale Seite.
 - Eigener Datenbank-Benutzer statt `root`, nur mit Rechten auf `tagebuch_app`.
 - `storage/` muss fuer PHP beschreibbar sein und darf nicht im Webroot liegen.
-- Datenschutzerklaerung (`public/datenschutz.php`) ist eine Vorlage: alle
-  `[Platzhalter]` ersetzen und rechtlich pruefen lassen.
+- Datenschutzerklaerung (`public/datenschutz.php`): nur noch den E-Mail-Anbieter ergaenzen
+  und rechtlich pruefen lassen. Schritt-fuer-Schritt-Anleitung fuers Hosting: `DEPLOY.md`.

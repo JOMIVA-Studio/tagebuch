@@ -1,0 +1,39 @@
+name: Deploy Mein Tagebuch
+
+# Bei jedem Push auf main wird die App per FTPS auf den Tophost-Server hochgeladen.
+# Nicht hochgeladen werden: src/config.php (liegt nur auf dem Server), storage/ (Daten der Nutzer).
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP-Syntax prüfen
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq php-cli
+          find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Per FTPS hochladen
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftp.jomiva.com
+          username: jomivac1
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          server-dir: tagebuch/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            .claude/**
+            .gitignore
+            .DS_Store
+            README.md
+            DEPLOY.md
+            archiv-bilder/**
+            storage/**
+            src/config.php
