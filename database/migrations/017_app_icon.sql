@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN app_icon VARCHAR(16) NOT NULL DEFAULT 'gruen';

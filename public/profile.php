@@ -61,6 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('/profile.php');
     }
 
+    if ($action === 'update_app_icon') {
+        $icon = app_icon_key(is_string($_POST['app_icon'] ?? null) ? $_POST['app_icon'] : null);
+        $stmt = $pdo->prepare('UPDATE users SET app_icon = :icon WHERE id = :id');
+        $stmt->execute(['icon' => $icon, 'id' => $user['id']]);
+        flash('success', 'App-Symbol gespeichert. Damit es auf dem Handy erscheint, entferne das alte Symbol vom Startbildschirm und füge die Seite neu hinzu.');
+        redirect('/profile.php');
+    }
+
     if ($action === 'update_reminders') {
         $enabled = isset($_POST['reminder_emails_enabled']) ? 1 : 0;
         $stmt = $pdo->prepare('UPDATE users SET reminder_emails_enabled = :val WHERE id = :id');
@@ -115,6 +123,23 @@ require __DIR__ . '/partials/header.php';
       <?php endforeach; ?>
     </div>
     <button class="btn btn-primary">Erinnerungen speichern</button>
+  </form>
+</div>
+<div class="card mb-0" style="margin-bottom:24px;">
+  <h2>App-Symbol für dein Handy</h2>
+  <p class="text-muted small">Wähle das Logo und die Farbe, die auf deinem Startbildschirm erscheinen sollen. Speichere deine Wahl und füge die Seite danach neu zum Startbildschirm hinzu (iPhone: Teilen → «Zum Home-Bildschirm», Android: Menü → «App installieren»).</p>
+  <form method="post">
+    <?= csrf_field() ?><input type="hidden" name="action" value="update_app_icon">
+    <div class="app-icon-picker">
+      <?php foreach (app_icon_choices() as $key => [$label]): ?>
+        <label class="app-icon-option">
+          <input type="radio" name="app_icon" value="<?= e($key) ?>" <?= app_icon_key($user['app_icon'] ?? null) === $key ? 'checked' : '' ?>>
+          <img src="/assets/icons/icon-<?= e($key) ?>-192.png" alt="" width="72" height="72">
+          <span><?= e($label) ?></span>
+        </label>
+      <?php endforeach; ?>
+    </div>
+    <button class="btn btn-primary">Symbol speichern</button>
   </form>
 </div>
 <div class="card-grid">

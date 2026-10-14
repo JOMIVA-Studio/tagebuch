@@ -162,3 +162,11 @@ body .app-shell main .day-goals-heading h2 { font-size:1.2rem; line-height:1.35;
 .day-goal-option { padding:14px 0; border:0; border-bottom:1px solid #eee5ec; border-radius:0; background:transparent; }
 .day-goal-option span { color:var(--color-ink); font-size:.84rem; }
 body .app-shell main .day-goals-save { width:auto; margin-top:16px; }
+
+/* App-Symbol-Auswahl im Profil */
+.app-icon-picker { display:flex; flex-wrap:wrap; gap:14px; margin:14px 0 18px; }
+.app-icon-option { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; font-size:.9rem; }
+.app-icon-option input { position:absolute; opacity:0; pointer-events:none; }
+.app-icon-option img { border-radius:18px; border:3px solid transparent; box-shadow:0 1px 4px rgba(0,0,0,.2); }
+.app-icon-option input:checked + img { border-color:var(--color-ink, #1a1a1a); box-shadow:0 0 0 3px rgba(36,181,79,.35); }
+.app-icon-option input:focus-visible + img { outline:3px solid #6b25b6; outline-offset:2px; }

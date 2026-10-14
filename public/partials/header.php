@@ -33,6 +33,12 @@ $navItems = [
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($pageTitle ?? $appName) ?> · <?= e($appName) ?></title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<?php $appIcon = app_icon_key($loggedInUser['app_icon'] ?? null); ?>
+  <link rel="apple-touch-icon" href="/assets/icons/icon-<?= e($appIcon) ?>-180.png">
+  <link rel="manifest" href="/manifest.php?i=<?= e($appIcon) ?>">
+  <meta name="theme-color" content="<?= e(app_icon_choices()[$appIcon][1]) ?>">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Tagebuch">
   <link rel="stylesheet" href="/assets/css/style.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../assets/css/style.css'),0,12) ?>">
   <link rel="stylesheet" href="/assets/css/consistency.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../assets/css/consistency.css'),0,12) ?>">
 </head>

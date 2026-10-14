@@ -134,3 +134,20 @@ function icon(string $name): string
     $body = $paths[$name] ?? $paths['grid'];
     return '<svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $body . '</svg>';
 }
+
+/** Auswahl für das App-Symbol auf dem Handy-Startbildschirm: Schlüssel => [Beschriftung, Themenfarbe]. */
+function app_icon_choices(): array
+{
+    return [
+        'gruen'   => ['Grün', '#24b54f'],
+        'violett' => ['Violett', '#6b25b6'],
+        'magenta' => ['Magenta', '#b523a2'],
+        'weiss'   => ['Weiss', '#ffffff'],
+        'schwarz' => ['Schwarz', '#1a1a1a'],
+    ];
+}
+
+function app_icon_key(?string $key): string
+{
+    return $key !== null && isset(app_icon_choices()[$key]) ? $key : 'gruen';
+}
