@@ -170,3 +170,11 @@ body .app-shell main .day-goals-save { width:auto; margin-top:16px; }
 .app-icon-option img { border-radius:18px; border:3px solid transparent; box-shadow:0 1px 4px rgba(0,0,0,.2); }
 .app-icon-option input:checked + img { border-color:var(--color-ink, #1a1a1a); box-shadow:0 0 0 3px rgba(36,181,79,.35); }
 .app-icon-option input:focus-visible + img { outline:3px solid #6b25b6; outline-offset:2px; }
+
+/* Anmelde-/Registrierungsseiten: Schwarz-Weiss mit den Logofarben, kein Dunkelgrün */
+body.auth-page { --color-ink:#1a1a1a; --color-dark:#1a1a1a; --color-muted:#6b6478; color:#1a1a1a; }
+body.auth-page .badge { background:#26b54f; color:#fff; }
+body.auth-page main .btn-primary { background:#26b54f; border-color:#26b54f; color:#fff; }
+body.auth-page main .btn-primary:hover { background:#1e913f; border-color:#1e913f; color:#fff; }
+body.auth-page main input:focus, body.auth-page main textarea:focus, body.auth-page main select:focus { border-color:#26b54f; box-shadow:0 0 0 3px rgba(38,181,79,.18); }
+body.auth-page main a:not(.btn):not(.logo) { color:#6b25b6; }

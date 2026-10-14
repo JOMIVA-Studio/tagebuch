@@ -42,7 +42,7 @@ $navItems = [
   <link rel="stylesheet" href="/assets/css/style.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../assets/css/style.css'),0,12) ?>">
   <link rel="stylesheet" href="/assets/css/consistency.css?v=<?= substr(hash_file('sha256', __DIR__ . '/../assets/css/consistency.css'),0,12) ?>">
 </head>
-<body class="<?= in_array($currentScript, ['goals.php', 'goal.php', 'vision.php'], true) ? 'theme-goals' : (in_array($currentScript, ['tracker.php', 'water.php', 'cycle.php', 'sleep.php'], true) ? 'theme-tracker' : 'theme-main') ?><?= in_array($currentScript, ['dashboard.php', 'profile.php'], true) ? ' home-neutral' : '' ?><?= $currentScript === 'profile.php' ? ' profile-neutral' : '' ?>">
+<body class="<?= in_array($currentScript, ['goals.php', 'goal.php', 'vision.php'], true) ? 'theme-goals' : (in_array($currentScript, ['tracker.php', 'water.php', 'cycle.php', 'sleep.php'], true) ? 'theme-tracker' : 'theme-main') ?><?= in_array($currentScript, ['dashboard.php', 'profile.php'], true) ? ' home-neutral' : '' ?><?= $currentScript === 'profile.php' ? ' profile-neutral' : '' ?><?= $usesSidebarShell ? '' : ' auth-page' ?>">
 <?php if ($usesSidebarShell): ?>
 <div class="app-shell">
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
